@@ -1,0 +1,2 @@
+Coloca aquí las canciones (.mp3) de los eventos.
+En el panel escribe la ruta, por ejemplo: musica/vals.mp3

@@ -1,0 +1,66 @@
+/* Tema: Aventura espacial */
+body.theme-espacial {
+  --bg: #0b1238; --ink: #eef1ff; --muted: #a9b0e0;
+  --accent: #ff8a3d; --accent-ink: #1a1034; --accent2: #ffd447;
+  --card: rgba(255, 255, 255, .07); --card-border: rgba(255, 255, 255, .16); --card-shadow: 0 20px 50px -25px rgba(0, 0, 0, .8);
+  --title-color: #8fd3ff; --name-color: #ffd447; --age-color: #ff8a3d;
+  --cd-bg: rgba(143, 211, 255, .1); --cd-color: #ffffff; --ico-bg: rgba(255, 138, 61, .15);
+  --field-bg: rgba(255, 255, 255, .08); --line: rgba(143, 211, 255, .35);
+  --cover-bg: radial-gradient(ellipse at 50% 30%, #2a2a7a 0%, #0b1238 70%);
+  --btn-shadow: 0 10px 26px -10px rgba(255, 138, 61, .9);
+  --font-body: 'Fredoka', system-ui, sans-serif;
+  --font-title: 'Baloo 2', 'Fredoka', system-ui, sans-serif;
+  --font-name: 'Baloo 2', 'Fredoka', system-ui, sans-serif;
+  background: #0b1238;
+}
+.theme-espacial #ambient { background: linear-gradient(180deg, #0b1238 0%, #1b1960 45%, #2b1a63 75%, #0b1238 100%); }
+.theme-espacial .name { font-weight: 800; letter-spacing: .01em; text-shadow: 0 6px 0 #ff5d73, 0 0 40px rgba(255, 212, 71, .35); }
+.theme-espacial .age-num { font-weight: 800; text-shadow: 0 0 30px rgba(255, 138, 61, .5); }
+.theme-espacial .kicker { color: #8fd3ff; font-weight: 600; text-transform: uppercase; letter-spacing: .14em; font-size: .9rem; }
+.theme-espacial .cover-name { font-weight: 800; color: #ffd447; }
+.theme-espacial .cover-kicker { color: #8fd3ff; }
+.theme-espacial .rsvp-name, .theme-espacial .firma { font-weight: 800; }
+.theme-espacial .sec-title { font-weight: 800; }
+.theme-espacial .btn.ghost { color: #ffd447; border-color: rgba(255, 212, 71, .6); }
+.theme-espacial .step { border-color: #ffd447; color: #ffd447; }
+.theme-espacial .check .box { border-color: #ffd447; }
+.theme-espacial .check input:checked + .box { background: #ffd447; }
+.theme-espacial .field textarea { color: #fff; }
+.theme-espacial .field textarea::placeholder { color: #8890c4; }
+.theme-espacial .t-dot { box-shadow: 0 0 0 4px #1b1960, 0 0 14px #ffd447; }
+.theme-espacial .cd-box { border: 1px solid rgba(143, 211, 255, .25); }
+.space-foot { color: var(--muted); letter-spacing: .2em; text-transform: uppercase; font-size: .8rem; margin-top: 10px; }
+
+/* Decoraciones de tarjetas */
+.theme-espacial .deco-countdown { top: -26px; right: -10px; animation: spin 18s linear infinite; }
+.theme-espacial .deco-when { top: -28px; left: 14px; animation: ufo 4s ease-in-out infinite; }
+.theme-espacial .deco-rsvp { top: -34px; right: 18px; animation: drift 6s ease-in-out infinite; }
+@keyframes spin { to { transform: rotate(360deg) } }
+@keyframes ufo { 0%, 100% { transform: translate(0, 0) rotate(-4deg) } 50% { transform: translate(10px, -6px) rotate(4deg) } }
+@keyframes drift { 0%, 100% { transform: translateY(0) rotate(-8deg) } 50% { transform: translateY(-10px) rotate(8deg) } }
+
+/* SVG animaciones */
+.theme-espacial .rk-float { animation: rkFloat 3.2s ease-in-out infinite; transform-origin: 150px 120px; }
+.theme-espacial .rk-flame { transform-origin: 150px 168px; animation: flame .18s ease-in-out infinite alternate; }
+.theme-espacial .tw { animation: twinkle 2.4s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+.theme-espacial .planet-a { animation: bob 6s ease-in-out infinite; }
+.theme-espacial .planet-b { animation: bob 5s ease-in-out infinite reverse; }
+.theme-espacial .orbit { transform-origin: 150px 130px; animation: orbit 30s linear infinite; }
+@keyframes rkFloat { 0%, 100% { transform: translateY(0) rotate(-2deg) } 50% { transform: translateY(-12px) rotate(2deg) } }
+@keyframes flame { from { transform: scaleY(.85) scaleX(.95) } to { transform: scaleY(1.15) scaleX(1.05) } }
+@keyframes twinkle { 0%, 100% { opacity: .3; transform: scale(.7) } 50% { opacity: 1; transform: scale(1.1) } }
+@keyframes bob { 0%, 100% { transform: translateY(0) } 50% { transform: translateY(8px) } }
+@keyframes orbit { to { transform: rotate(360deg) } }
+
+/* Despegue al abrir */
+.theme-espacial.launch .hero-art .rk-float { animation: blast 1.5s cubic-bezier(.5, 0, .3, 1) both; }
+@keyframes blast { 0% { transform: translateY(60px) scale(.9) } 60% { transform: translateY(-20px) scale(1.04) } 100% { transform: translateY(0) } }
+
+/* Fondo: estrellas, estrellas fugaces y nebulosas */
+.theme-espacial .star { position: absolute; border-radius: 50%; background: #fff; animation: starTw ease-in-out infinite; }
+@keyframes starTw { 0%, 100% { opacity: .2 } 50% { opacity: 1 } }
+.theme-espacial .shoot { position: absolute; width: 120px; height: 2px; background: linear-gradient(90deg, #fff, transparent); border-radius: 2px; transform: rotate(-35deg); opacity: 0; animation: shoot 9s ease-in infinite; }
+@keyframes shoot { 0%, 88% { opacity: 0; translate: 0 0 } 90% { opacity: 1 } 100% { opacity: 0; translate: -420px 290px } }
+.theme-espacial .neb { position: absolute; border-radius: 50%; filter: blur(60px); opacity: .35; }
+.theme-espacial .neb.n1 { width: 60vmax; height: 60vmax; left: -25vmax; top: 30%; background: #6a3cc4; }
+.theme-espacial .neb.n2 { width: 50vmax; height: 50vmax; right: -25vmax; top: -10%; background: #1f6fbf; }

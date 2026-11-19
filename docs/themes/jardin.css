@@ -1,0 +1,80 @@
+/* Tema: Jardín de mariposas */
+body.theme-jardin {
+  --bg: #fff5f3; --ink: #5b4152; --muted: #a2879a;
+  --accent: #e07aa6; --accent-ink: #ffffff; --accent2: #f2b84b;
+  --card: rgba(255, 255, 255, .78); --card-border: #f6d6e2; --card-shadow: 0 22px 44px -28px rgba(201, 98, 145, .55);
+  --title-color: #c0679a; --name-color: #d4648f; --age-color: #f2b84b;
+  --cd-bg: #fdecf2; --cd-color: #c0679a; --ico-bg: #fdecf2;
+  --field-bg: #fff6f9; --line: #f3c1d4;
+  --cover-bg: radial-gradient(ellipse at 50% 40%, #fff 0%, #fde7ee 75%);
+  --btn-shadow: 0 12px 24px -12px rgba(224, 122, 166, .9);
+  --radius: 32px;
+  --font-body: 'Nunito', system-ui, sans-serif;
+  --font-title: 'Sniglet', 'Nunito', system-ui, sans-serif;
+  --font-name: 'Pacifico', cursive;
+  background: #fff5f3;
+}
+.theme-jardin #ambient { background: linear-gradient(180deg, #fff7f4 0%, #fdeef3 40%, #f6eefb 75%, #fff5f3 100%); }
+.theme-jardin .name { font-size: clamp(3.2rem, 16vw, 5rem); padding: 0 .1em; text-shadow: 0 4px 0 #fbd3e1; }
+.theme-jardin .age-num { font-family: 'Sniglet', sans-serif; font-weight: 800; text-shadow: 0 4px 0 #fde6b5; }
+.theme-jardin .kicker { font-family: 'Sniglet', sans-serif; color: #b07fae; font-size: 1.15rem; }
+.theme-jardin .sec-title { font-weight: 800; }
+.theme-jardin .cover-name { color: #d4648f; }
+.theme-jardin .card { border-width: 2px; }
+.theme-jardin .card::after { content: ''; position: absolute; inset: 8px; border: 1.5px dashed #f6d0de; border-radius: calc(var(--radius) - 8px); pointer-events: none; }
+.theme-jardin .t-dot { background: #f7a8c4; box-shadow: 0 0 0 4px #fff, 0 0 0 6px #f7c4d6; }
+.theme-jardin .rsvp-name { font-size: 2rem; }
+.theme-jardin .foot-flowers { display: block; margin: 12px auto 0; }
+
+/* Decoraciones de tarjetas */
+.theme-jardin .deco { z-index: 2; }
+.theme-jardin .deco-countdown { top: -28px; left: -8px; }
+.theme-jardin .deco-when { top: -30px; right: 10px; animation: hover 3.6s ease-in-out infinite; }
+.theme-jardin .deco-schedule { top: -22px; right: -6px; }
+.theme-jardin .deco-rsvp { top: -36px; left: 50%; margin-left: -32px; animation: hover 3s ease-in-out infinite; }
+@keyframes hover { 0%, 100% { transform: translateY(0) rotate(-6deg) } 50% { transform: translateY(-8px) rotate(6deg) } }
+
+/* Mariposas */
+.theme-jardin .wing { animation: flap .5s ease-in-out infinite alternate; }
+.theme-jardin .bf-main .wing { animation-duration: .9s; }
+@keyframes flap { from { transform: scaleX(1) } to { transform: scaleX(.35) } }
+.theme-jardin .bf-main { animation: hover2 4s ease-in-out infinite; }
+.theme-jardin .bf-a { animation: flyA 7s ease-in-out infinite; }
+.theme-jardin .bf-b { animation: flyB 8s ease-in-out infinite; }
+@keyframes hover2 { 0%, 100% { transform: translateY(0) } 50% { transform: translateY(-8px) } }
+@keyframes flyA { 0%, 100% { transform: translate(0, 0) } 50% { transform: translate(18px, 14px) } }
+@keyframes flyB { 0%, 100% { transform: translate(0, 0) } 50% { transform: translate(-20px, 18px) } }
+.theme-jardin .sp { animation: spark 2.2s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+@keyframes spark { 0%, 100% { opacity: .2; transform: scale(.6) } 50% { opacity: 1; transform: scale(1.2) } }
+.theme-jardin .fl { transform-box: fill-box; transform-origin: center; }
+.theme-jardin.bloom .hero-art .fl { animation: bloom 1s cubic-bezier(.3, 1.6, .5, 1) both; }
+.theme-jardin.bloom .hero-art .fl:nth-of-type(2n) { animation-delay: .15s; }
+.theme-jardin.bloom .hero-art .fl:nth-of-type(3n) { animation-delay: .3s; }
+@keyframes bloom { from { transform: scale(0) rotate(-90deg) } to { transform: none } }
+.theme-jardin .cover .flap { transform-box: fill-box; transform-origin: top; animation: flapIdle 3s ease-in-out infinite; }
+@keyframes flapIdle { 0%, 100% { transform: scaleY(1) } 50% { transform: scaleY(.94) } }
+
+/* Fondo: manchas suaves, pétalos y mariposas volando */
+.theme-jardin .blob { position: absolute; border-radius: 50%; filter: blur(50px); opacity: .45; }
+.theme-jardin .blob.b1 { width: 50vmax; height: 50vmax; left: -20vmax; top: -10vmax; background: #ffd6e4; }
+.theme-jardin .blob.b2 { width: 45vmax; height: 45vmax; right: -20vmax; top: 40%; background: #e6dafc; }
+.theme-jardin .blob.b3 { width: 40vmax; height: 40vmax; left: 10%; bottom: -20vmax; background: #ffe6cf; }
+.theme-jardin .petal { position: absolute; top: -20px; width: calc(12px * var(--s)); height: calc(16px * var(--s)); border-radius: 80% 0 80% 0; opacity: .75; animation: petal linear infinite; }
+@keyframes petal {
+  0% { transform: translate(0, -5vh) rotate(0) }
+  25% { transform: translate(30px, 25vh) rotate(90deg) }
+  50% { transform: translate(-20px, 55vh) rotate(200deg) }
+  75% { transform: translate(25px, 80vh) rotate(290deg) }
+  100% { transform: translate(-10px, 108vh) rotate(380deg) }
+}
+.theme-jardin .fly { position: absolute; opacity: .85; }
+.theme-jardin .fly0 { top: 20%; animation: across 22s linear infinite; }
+.theme-jardin .fly1 { top: 60%; animation: across 28s linear infinite reverse; animation-delay: -8s; }
+.theme-jardin .fly2 { top: 82%; animation: across 34s linear infinite; animation-delay: -18s; }
+@keyframes across {
+  0% { left: -10%; transform: translateY(0) }
+  25% { transform: translateY(-40px) }
+  50% { transform: translateY(20px) }
+  75% { transform: translateY(-30px) }
+  100% { left: 110%; transform: translateY(0) }
+}

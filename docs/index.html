@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Invitaciones digitales</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;700&family=Great+Vibes&family=Baloo+2:wght@800&family=Pacifico&family=Great+Vibes&family=Cormorant+Garamond:wght@600&display=swap">
+  <style>
+    body { margin: 0; font: 16px/1.55 'Quicksand', system-ui, sans-serif; color: #4a443b; background: #faf5ee; }
+    .wrap { max-width: 900px; margin: 0 auto; padding: 48px 20px 60px; text-align: center; }
+    h1 { font-family: 'Great Vibes', cursive; font-weight: 400; font-size: clamp(3rem, 10vw, 4.6rem); color: #5e97ab; margin: 0; line-height: 1.1; }
+    .sub { color: #9a907f; max-width: 52ch; margin: 8px auto 34px; }
+    .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 18px; text-align: left; }
+    .demo { display: block; border-radius: 22px; padding: 26px 22px; text-decoration: none; color: inherit; min-height: 210px; position: relative; overflow: hidden; transition: transform .2s, box-shadow .2s; }
+    .demo:hover { transform: translateY(-4px); box-shadow: 0 20px 40px -24px rgba(0,0,0,.45); }
+    .demo small { text-transform: uppercase; letter-spacing: .16em; font-size: .72rem; opacity: .8; }
+    .demo .n { display: block; margin: 6px 0 4px; font-size: 2.6rem; line-height: 1.05; }
+    .demo p { margin: 0; opacity: .85; font-size: .92rem; max-width: 22ch; }
+    .demo .go { position: absolute; left: 22px; bottom: 18px; font-weight: 700; font-size: .9rem; }
+    .demo .em { position: absolute; right: 16px; bottom: 6px; font-size: 76px; opacity: .9; }
+    .space { background: linear-gradient(160deg, #0b1238, #2b1a63); color: #eef1ff; }
+    .space .n { font-family: 'Baloo 2', sans-serif; color: #ffd447; text-shadow: 0 4px 0 #ff5d73; }
+    .garden { background: linear-gradient(160deg, #fff4f1, #f3e6fb); color: #5b4152; border: 2px solid #f6d6e2; }
+    .garden .n { font-family: 'Pacifico', cursive; color: #d4648f; font-weight: 400; }
+    .xv { background: linear-gradient(160deg, #fffaf7, #f6e1dc); color: #4b3a36; border: 1px solid #ead8c6; }
+    .xv .n { font-family: 'Great Vibes', cursive; font-weight: 400; color: #b98a3c; font-size: 3rem; }
+    .panel { background: #fffdf9; border: 1px solid #e7dcc8; }
+    .panel .n { font-family: 'Great Vibes', cursive; color: #5e97ab; font-weight: 400; }
+    .how { margin-top: 44px; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; text-align: left; }
+    .how div { background: #fffdf9; border: 1px solid #e7dcc8; border-radius: 16px; padding: 16px; font-size: .9rem; }
+    .how b { display: block; color: #5e97ab; margin-bottom: 4px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Invitaciones</h1>
+    <p class="sub">Invitaciones digitales con confirmación de asistencia. Cada evento tiene su propio diseño y su propia hoja de invitados.</p>
+    <div class="cards">
+      <a class="demo space" id="dMateo"><small>Demo · cumpleaños niño</small><span class="n">Mateo · 6</span><p>Aventura espacial con cohete, estrellas y cuenta regresiva.</p><span class="go">Ver invitación →</span><span class="em">🚀</span></a>
+      <a class="demo garden" id="dVale"><small>Demo · cumpleaños niña</small><span class="n">Valentina · 4</span><p>Jardín de mariposas con flores y pétalos animados.</p><span class="go">Ver invitación →</span><span class="em">🦋</span></a>
+      <a class="demo xv" id="dSofia"><small>Demo · XV años</small><span class="n">Sofía Valeria</span><p>Rosa y oro, con fotos, música, padrinos, misa y recepción con croquis.</p><span class="go">Ver invitación →</span><span class="em">👑</span></a>
+      <a class="demo panel" href="panel.html"><small>Para ti y tus clientes</small><span class="n">Panel</span><p>Crea eventos, invitados y mira quién confirmó.</p><span class="go">Entrar →</span><span class="em">📋</span></a>
+    </div>
+    <div class="how">
+      <div><b>1 · Super usuario</b>Creas el evento, eliges el diseño y das de alta al cliente.</div>
+      <div><b>2 · Festejador</b>Entra al panel, agrega invitados y los envía por WhatsApp.</div>
+      <div><b>3 · Invitado</b>Abre su enlace personal y confirma cuántos asistirán.</div>
+    </div>
+  </div>
+  <script src="js/config.js"></script>
+  <script src="js/common.js"></script>
+  <script src="js/api.js"></script>
+  <script>
+    // Las tarjetas demo solo funcionan en modo demo (sin API_URL). Con tu servidor real se ocultan;
+    // si luego quieres mostrar ejemplos reales, cambia estos IDs/tokens por los de tus propios eventos.
+    if (!API.isDemo) ['dMateo', 'dVale', 'dSofia'].forEach(id => document.getElementById(id).style.display = 'none');
+    document.getElementById('dMateo').href = U.inviteUrl('mateo-6', 'Tz4hQ8nLs3Ve');
+    document.getElementById('dVale').href = U.inviteUrl('valentina-4', 'Jm4pXc7wRd2N');
+    document.getElementById('dSofia').href = U.inviteUrl('sofia-xv', 'Xv3dLw9sTe4K');
+  </script>
+</body>
+</html>

@@ -1,5 +1,5 @@
 :root {
-  --bg: #faf5ee; --card: #fffdf9; --line: #e7dcc8; --ink: #4a443b; --muted: #9a907f;
+  --bg: #ffffff; --card: #ffffff; --line: #e7dcc8; --ink: #4a443b; --muted: #9a907f;
   --teal: #5e97ab; --teal-d: #4a8196; --green: #6f9a6a; --red: #c0584e; --sand: #b8ad8e;
 }
 * { box-sizing: border-box; }

@@ -43,7 +43,7 @@
   };
 
   /* ================= BACKEND DEMO (imita a Code.gs) ================= */
-  const DEMO_KEY = 'inv_demo_v6';
+  const DEMO_KEY = 'inv_demo_v8';
   const Demo = {
     db: null,
     load() {
@@ -236,24 +236,41 @@
       ],
       events: [
         {
-          id: 'mateo-6', propietario: 'familia.mateo', tema: 'espacial', activo: true, creado: d(20), actualizado: d(2),
+          id: 'mateo-6', propietario: 'familia.mateo', tema: 'heroe', activo: true, creado: d(20), actualizado: d(1),
           config: {
             tipo: 'cumpleanos', festejado: 'Mateo', edad: 6,
-            encabezado: '¡Prepárate para despegar!',
-            frase: 'Mateo cumple 6 años y te invita a una aventura fuera de este mundo.',
+            encabezado: '¡Ven a mi fiesta!',
+            frase: 'Mateo cumple 6 años y necesita a su equipo de héroes para la misión más divertida del año. ¿Te unes?',
             fecha: '2027-03-13T15:00', duracionHoras: 4,
-            lugar: { nombre: 'Salón de Fiestas Galaxia', direccion: 'Av. Revolución 1234, Zona Centro, Tijuana, B.C.', mapa: 'https://maps.google.com/?q=Av.+Revolucion+1234+Tijuana' },
-            horario: [
-              { hora: '3:00 p. m.', texto: 'Despegue: llegada de los astronautas' },
-              { hora: '4:00 p. m.', texto: 'Misión piñata en el planeta rojo' },
-              { hora: '5:30 p. m.', texto: 'Pastel y canción de cumpleaños' },
-              { hora: '7:00 p. m.', texto: 'Aterrizaje: fin de la misión' },
+            fotoPortada: 'fotos/mateo-portada.jpg',
+            galeria: ['fotos/mateo-galeria-1.jpg', 'fotos/mateo-galeria-2.jpg', 'fotos/mateo-galeria-3.jpg', 'fotos/mateo-galeria-4.jpg'],
+            separadores: [
+              { foto: 'fotos/mateo-sep-1.jpg', texto: '¡Héroe en entrenamiento!', pos: '55% 45%' },
+              { foto: 'fotos/mateo-sep-2.jpg', texto: '¡Misión: diversión!', pos: '50% 40%' },
             ],
-            vestimenta: 'Ven de astronauta, alien o con tu playera espacial favorita.',
-            regalos: 'Tu presencia es el mejor regalo. Si deseas obsequiar algo, habrá caja para sobres.',
-            firma: 'Con cariño, Daniel y Sofía',
+            musica: 'musica/fiesta.mp3',
+            musicaCredito: 'Monkeys Spinning Monkeys — Kevin MacLeod (incompetech.com), CC BY 3.0',
+            lugares: [
+              { titulo: 'Base secreta', hora: '3:00 p. m.', nombre: 'Salón de Fiestas Galaxia', direccion: 'Av. Revolución 1234, Zona Centro, Tijuana, B.C.', mapa: 'https://maps.google.com/?q=Av.+Revolucion+1234+Tijuana', croquis: '' },
+            ],
+            horario: [
+              { hora: '3:00 p. m.', texto: 'Llegada de los héroes' },
+              { hora: '3:30 p. m.', texto: 'Entrenamiento: juegos y circuito de obstáculos' },
+              { hora: '4:30 p. m.', texto: 'Misión piñata' },
+              { hora: '5:30 p. m.', texto: 'Pastel y mañanitas' },
+              { hora: '6:30 p. m.', texto: 'Fiesta y bolos sorpresa' },
+            ],
+            vestimenta: '¡Ven disfrazado de tu héroe favorito o con capa! Habrá antifaces para todos.',
+            regalos: 'Tu presencia es el mejor regalo. Si deseas traer algo, a Mateo le encantan los bloques y los carritos.',
+            rsvpPreguntas: { alergias: true, cancion: false },
+            faq: [
+              { p: '¿Pueden ir los papás?', r: '¡Claro! Los papás también son parte del equipo.' },
+              { p: '¿Hay estacionamiento?', r: 'Sí, el salón tiene estacionamiento gratuito.' },
+            ],
+            pase: true,
+            firma: '¡Te espera tu equipo! · Daniel y Sofía',
             fechaLimite: '2027-03-01',
-            whatsapp: '¡Hola {nombre}! 🚀 {festejado} cumple {edad} y queremos que despegues con nosotros. Aquí está tu invitación: {enlace}',
+            whatsapp: '¡Hola {nombre}! ⚡ Mateo cumple {edad} y te necesita en su equipo de héroes. Aquí está tu invitación: {enlace}',
           },
         },
         {

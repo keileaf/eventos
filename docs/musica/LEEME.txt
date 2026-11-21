@@ -1,2 +1,7 @@
 Coloca aquí las canciones (.mp3) de los eventos.
 En el panel escribe la ruta, por ejemplo: musica/vals.mp3
+
+Demo de Mateo: guarda aquí un archivo llamado  fiesta.mp3
+Sugerencia libre de derechos (solo pide dar crédito, ya incluido al pie de la invitación):
+  "Monkeys Spinning Monkeys" de Kevin MacLeod  ->  https://incompetech.com
+Si el archivo no existe, el botón de música simplemente no aparece.

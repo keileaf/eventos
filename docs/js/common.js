@@ -32,7 +32,8 @@
   // Enlace a una invitación. En modo demo se usa #, en producción ?e=&i= (más limpio para WhatsApp)
   U.inviteUrl = (e, i, absolute) => {
     const q = 'e=' + encodeURIComponent(e) + (i ? '&i=' + encodeURIComponent(i) : '');
-    const rel = 'invitacion.html' + (window.API && API.isDemo ? '#' : '?') + q;
+    const rel = window.API && API.forcedDemo ? 'invitacion.html?demo=1&' + q
+      : 'invitacion.html' + (window.API && API.isDemo ? '#' : '?') + q;
     return absolute ? new URL(rel, location.href).href : rel;
   };
 

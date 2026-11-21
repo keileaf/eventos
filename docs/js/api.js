@@ -1,7 +1,10 @@
 /* Cliente de la API + backend de demostración (cuando API_URL está vacío). */
 (function () {
   const CFG = window.APP_CONFIG || {};
-  const SESSION_KEY = 'inv_session';
+  // Modo demo: sin API_URL, o forzado con ?demo=1 en la dirección (no toca la hoja de cálculo real)
+  const forcedDemo = !!CFG.API_URL && new URLSearchParams(location.search).get('demo') === '1';
+  const IS_DEMO = !CFG.API_URL || forcedDemo;
+  const SESSION_KEY = IS_DEMO ? 'inv_session_demo' : 'inv_session';
   const store = {
     get(k) { try { return JSON.parse(sessionStorage.getItem(k)); } catch (e) { return null; } },
     set(k, v) { try { sessionStorage.setItem(k, JSON.stringify(v)); } catch (e) {} },
@@ -10,7 +13,10 @@
 
   let memSession = null;
   const API = {
-    isDemo: !CFG.API_URL,
+    isDemo: IS_DEMO,
+    forcedDemo,
+    // agrega ?demo=1 a enlaces internos cuando el demo es forzado
+    link(path) { return forcedDemo ? path + (path.includes('?') ? '&' : '?') + 'demo=1' : path; },
     session() { return memSession || store.get(SESSION_KEY); },
     setSession(s) { memSession = s; s ? store.set(SESSION_KEY, s) : store.del(SESSION_KEY); },
 
@@ -37,7 +43,7 @@
   };
 
   /* ================= BACKEND DEMO (imita a Code.gs) ================= */
-  const DEMO_KEY = 'inv_demo_v2';
+  const DEMO_KEY = 'inv_demo_v6';
   const Demo = {
     db: null,
     load() {
@@ -87,7 +93,8 @@
     },
     publicGuest(g) {
       return { token: g.token, nombre: g.nombre, personas: split(g.personas), lugares: g.lugares, estado: g.estado,
-        confirmados: g.confirmados, detalle: split(g.detalle), mensaje: g.mensaje, respondido: g.respondido };
+        confirmados: g.confirmados, detalle: split(g.detalle), mensaje: g.mensaje, respondido: g.respondido,
+        mesa: g.mesa || '', extras: g.extras || {} };
     },
     createUser(d, rol) {
       const usuario = String(d.usuario || '').trim().toLowerCase();
@@ -123,7 +130,9 @@
           c = sel.length; det = sel.join(', ');
         } else c = Math.max(0, Math.min(g.lugares, Math.floor(+req.cantidad || 0)));
         if (req.asistira === false) { c = 0; det = ''; }
-        Object.assign(g, { confirmados: c, detalle: det, estado: c > 0 ? 'confirmó' : 'declinó', mensaje: String(req.mensaje || '').slice(0, 500), respondido: now() });
+        const ex = req.extras || {};
+        Object.assign(g, { confirmados: c, detalle: det, estado: c > 0 ? 'confirmó' : 'declinó', mensaje: String(req.mensaje || '').slice(0, 500), respondido: now(),
+          extras: { alergias: String(ex.alergias || '').slice(0, 300), cancion: String(ex.cancion || '').slice(0, 150) } });
         return this.publicGuest(g);
       },
       login(req) {
@@ -163,7 +172,7 @@
         let g = d.token && this.guests(ev.id).find(x => x.token === d.token);
         if (g && g.estado && g.estado !== 'pendiente') throw new Error('Esta invitación ya fue respondida y no se puede modificar. Elimínala y crea una nueva.');
         if (!g) { g = { token: rid(12), estado: 'pendiente', confirmados: 0, detalle: '', mensaje: '', respondido: '', enviado: '', creado: now() }; this.guests(ev.id).push(g); }
-        Object.assign(g, { nombre, personas: split(d.personas).join(', '), lugares: Math.max(1, Math.min(20, Math.floor(+d.lugares || 1))), telefono: String(d.telefono || '') });
+        Object.assign(g, { nombre, personas: split(d.personas).join(', '), lugares: Math.max(1, Math.min(20, Math.floor(+d.lugares || 1))), telefono: String(d.telefono || ''), mesa: String(d.mesa || '').slice(0, 20) });
         return g;
       },
       deleteGuest(req) {
@@ -173,7 +182,7 @@
       reissueGuest(req) {
         const ev = this.eventFor(this.auth(req), req.e);
         const old = this.guests(ev.id).find(x => x.token === req.token); if (!old) throw new Error('Invitado no encontrado');
-        const g = { token: rid(12), nombre: old.nombre, personas: old.personas, lugares: old.lugares, telefono: old.telefono, estado: 'pendiente', confirmados: 0, detalle: '', mensaje: '', respondido: '', enviado: '', creado: now() };
+        const g = { token: rid(12), nombre: old.nombre, personas: old.personas, lugares: old.lugares, telefono: old.telefono, mesa: old.mesa || '', estado: 'pendiente', confirmados: 0, detalle: '', mensaje: '', respondido: '', enviado: '', creado: now() };
         this.db.guests[ev.id] = this.guests(ev.id).filter(x => x !== old); this.db.guests[ev.id].push(g); return g;
       },
       markSent(req) {
@@ -222,6 +231,8 @@
         { usuario: 'familia.mateo', password: 'mateo123', rol: 'cliente', nombre: 'Daniel y Sofía', creado: d(20) },
         { usuario: 'familia.vale', password: 'vale123', rol: 'cliente', nombre: 'Andrea y Luis', creado: d(18) },
         { usuario: 'familia.sofia', password: 'sofia123', rol: 'cliente', nombre: 'Mónica y Javier', creado: d(25) },
+        { usuario: 'familia.camila', password: 'camila123', rol: 'cliente', nombre: 'Patricia y Andrés', creado: d(22) },
+        { usuario: 'novios.ar', password: 'boda123', rol: 'cliente', nombre: 'Andrea y Rodrigo', creado: d(30) },
       ],
       events: [
         {
@@ -299,8 +310,127 @@
             whatsapp: '¡Hola {nombre}! ✨ Con mucha ilusión te invito a mis XV años. Aquí está tu invitación: {enlace}',
           },
         },
+        {
+          id: 'camila-xv', propietario: 'familia.camila', tema: 'xv-azul', activo: true, creado: d(22), actualizado: d(1),
+          config: {
+            tipo: 'xv', festejado: 'Camila Renata', edad: '', encabezado: 'Mis XV años',
+            frase: 'Hay días que se guardan para siempre en el corazón. Me encantaría que este fuera uno de ellos y que lo vivas conmigo.',
+            cita: 'Llegar a mis quince es un regalo; celebrarlo con ustedes lo hace inolvidable.',
+            fecha: '2027-09-18T18:00', duracionHoras: 7,
+            fotoPortada: 'fotos/xv-portada.jpg',
+            galeria: ['fotos/xv-galeria-1.jpg', 'fotos/xv-galeria-2.jpg', 'fotos/xv-galeria-3.jpg', 'fotos/xv-galeria-4.jpg', 'fotos/xv-galeria-5.jpg'],
+            separadores: [
+              { foto: 'fotos/xv-sep-1.jpg', texto: 'Hoy empieza mi historia', autor: 'Camila', pos: '50% 45%' },
+              { foto: 'fotos/xv-sep-2.jpg', texto: 'Con la bendición de Dios', pos: '50% 35%' },
+              { foto: 'fotos/xv-galeria-3.jpg', texto: '¿Me acompañas?', pos: '55% 40%' },
+            ],
+            musica: 'cajita',
+            padres: [
+              { titulo: 'Mis padres', nombres: ['Patricia Morales', 'Andrés Villaseñor'] },
+              { titulo: 'Mis padrinos', nombres: ['Gabriela Núñez', 'Fernando Ibarra'] },
+              { titulo: 'Mi corte de honor', nombres: ['Diego Ramos', 'Emiliano Cruz', 'Santiago Lara', 'Mateo Ortega'] },
+            ],
+            lugares: [
+              { titulo: 'Misa de acción de gracias', hora: '6:00 p. m.', nombre: 'Parroquia del Sagrado Corazón', direccion: 'Av. Independencia 2100, Tijuana, B.C.', mapa: 'https://maps.google.com/?q=Av.+Independencia+2100+Tijuana', croquis: '' },
+              { titulo: 'Recepción', hora: '8:00 p. m.', nombre: 'Jardín Los Olivos', direccion: 'Blvd. Agua Caliente 9800, Tijuana, B.C.', mapa: 'https://maps.google.com/?q=Blvd+Agua+Caliente+9800+Tijuana', croquis: 'fotos/demo-croquis.svg' },
+            ],
+            horario: [
+              { hora: '6:00 p. m.', texto: 'Misa de acción de gracias' },
+              { hora: '8:00 p. m.', texto: 'Recepción de invitados' },
+              { hora: '9:00 p. m.', texto: 'Vals con mi papá y mi corte' },
+              { hora: '9:30 p. m.', texto: 'Cena' },
+              { hora: '10:30 p. m.', texto: 'Brindis y pastel' },
+              { hora: '11:00 p. m.', texto: '¡A la pista a bailar!' },
+            ],
+            vestimenta: 'Formal. Te sugerimos estos tonos para que las fotos queden hermosas.',
+            paleta: ['#e9dfd3', '#c9b8a6', '#9fa8a3', '#7a8b99', '#d8b4a8'],
+            reservado: { color: '#9fc3ea', texto: 'El azul cielo está reservado para la quinceañera' },
+            regalos: 'Tu presencia es mi mejor regalo. Si deseas tener un detalle conmigo:',
+            mesaRegalos: [{ tienda: 'Liverpool', numero: '51234567', url: '' }],
+            sobres: { banco: 'Banco de ejemplo', titular: 'Patricia Morales (ejemplo)', clabe: '0123 4567 8901 2345 67', nota: 'También habrá caja para sobres el día del evento.' },
+            hashtag: '#CamilaXV',
+            hashtagTexto: 'Sube tus fotos y videos con este hashtag para que ningún momento se pierda.',
+            pase: true,
+            firma: 'Con cariño, Camila Renata',
+            fechaLimite: '2027-09-01',
+            whatsapp: '¡Hola {nombre}! 💙 Me encantaría que me acompañes en mis XV años. Aquí está tu invitación: {enlace}',
+          },
+        },
+        {
+          id: 'andrea-rodrigo', propietario: 'novios.ar', tema: 'boda', activo: true, creado: d(30), actualizado: d(1),
+          config: {
+            tipo: 'boda', festejado: 'Andrea & Rodrigo', edad: '', encabezado: 'Nos casamos',
+            frase: 'Después de muchos atardeceres juntos, decidimos compartir todos los que vienen. Queremos que estés ahí.',
+            cita: 'Elegirte fue fácil; lo difícil fue esperar este día.',
+            fecha: '2027-10-16T17:00', duracionHoras: 8,
+            fotoPortada: 'fotos/boda-portada.jpg',
+            historia: [
+              { fecha: '2019', titulo: 'Nos conocimos', texto: 'Una reunión de amigos, una plática que no queríamos terminar y muchas risas desde el primer día.', foto: 'fotos/boda-historia-1.jpg' },
+              { fecha: '2021', titulo: 'Caminando juntos', texto: 'Viajes, mudanzas y domingos sin prisa. Aprendimos que con el otro todo es mejor.', foto: 'fotos/boda-historia-2.jpg' },
+              { fecha: '2026', titulo: 'Dijimos que sí', texto: 'Al atardecer, entre abrazos y lágrimas de felicidad, decidimos ser familia para siempre.', foto: 'fotos/boda-historia-3.jpg' },
+            ],
+            galeria: ['fotos/boda-galeria-1.jpg', 'fotos/boda-galeria-2.jpg', 'fotos/boda-galeria-3.jpg', 'fotos/boda-galeria-4.jpg'],
+            musica: 'https://upload.wikimedia.org/wikipedia/commons/c/c6/Canon_in_D_Major_(ISRC_USUAN1100301).mp3',
+            musicaCredito: 'Canon in D Major — Kevin MacLeod (incompetech.com), CC BY 3.0',
+            padres: [
+              { titulo: 'Padres de la novia', nombres: ['Lucía Herrera', 'Manuel Salas'] },
+              { titulo: 'Padres del novio', nombres: ['Teresa Galván', 'Jorge Medina'] },
+              { titulo: 'Padrinos', nombres: ['Mariana Ortiz', 'Daniel Ochoa'] },
+            ],
+            separadores: [
+              { foto: 'fotos/boda-galeria-1.jpg', texto: 'Para siempre empieza aquí', pos: '50% 35%' },
+              { foto: 'fotos/boda-historia-2.jpg', texto: 'Caminemos juntos', autor: 'Andrea & Rodrigo', pos: '50% 40%' },
+              { foto: 'fotos/boda-galeria-2.jpg', texto: '¿Celebras con nosotros?', pos: '50% 30%' },
+            ],
+            lugares: [
+              { titulo: 'Ceremonia religiosa', hora: '5:00 p. m.', nombre: 'Capilla del Rosario', direccion: 'Valle de Guadalupe, Ensenada, B.C.', mapa: 'https://maps.google.com/?q=Valle+de+Guadalupe+Ensenada', croquis: '' },
+              { titulo: 'Recepción', hora: '7:00 p. m.', nombre: 'Viñedo Los Encinos', direccion: 'Carretera Tecate–Ensenada km 78, Valle de Guadalupe, B.C.', mapa: 'https://maps.google.com/?q=Valle+de+Guadalupe+vinedo', croquis: '' },
+              { titulo: 'Tornaboda · domingo 17', hora: '11:00 a. m.', nombre: 'Brunch en el viñedo', direccion: 'Mismo lugar de la recepción. Ropa cómoda.', mapa: 'https://maps.google.com/?q=Valle+de+Guadalupe+vinedo', croquis: '' },
+            ],
+            horario: [
+              { hora: '5:00 p. m.', texto: 'Ceremonia religiosa' },
+              { hora: '6:30 p. m.', texto: 'Cóctel de bienvenida al atardecer' },
+              { hora: '7:30 p. m.', texto: 'Entrada de los novios y primer baile' },
+              { hora: '8:30 p. m.', texto: 'Cena' },
+              { hora: '10:00 p. m.', texto: 'Fiesta' },
+            ],
+            vestimenta: 'Formal de jardín. Sugerimos tacón ancho: la recepción es sobre pasto.',
+            paleta: ['#7d8f6e', '#c9b78f', '#e9dcc2', '#1f2f4d', '#b07a6a'],
+            reservado: { color: '#ffffff', texto: 'El blanco es solo para la novia' },
+            regalos: 'Tu compañía es nuestro mejor regalo. Si deseas tener un detalle con nosotros:',
+            mesaRegalos: [{ tienda: 'Liverpool', numero: '51998877', url: '' }, { tienda: 'Amazon', numero: '', url: 'https://www.amazon.com.mx/wedding' }],
+            sobres: { banco: 'Banco de ejemplo', titular: 'Andrea Salas (ejemplo)', clabe: '0123 4567 8901 2345 67', nota: 'También habrá caja para sobres en la recepción.' },
+            hashtag: '#AndreaYRodrigo',
+            hashtagTexto: 'Comparte tus fotos y videos con nuestro hashtag. ¡Queremos ver la boda desde tus ojos!',
+            rsvpPreguntas: { alergias: true, cancion: true },
+            hospedaje: [
+              { nombre: 'Hotel Boutique Valle', nota: 'A 5 min del viñedo · tarifa especial con el código BODA-AR', url: 'https://maps.google.com/?q=hotel+Valle+de+Guadalupe' },
+              { nombre: 'Cabañas Las Lomas', nota: 'Opción económica · a 12 min', url: 'https://maps.google.com/?q=caba%C3%B1as+Valle+de+Guadalupe' },
+            ],
+            faq: [
+              { p: '¿Puedo llevar acompañante?', r: 'Tu invitación indica los lugares reservados para ti. Por cupo, te pedimos respetar ese número.' },
+              { p: '¿Pueden ir niños?', r: 'Amamos a los pequeños, pero esta celebración será solo para adultos.' },
+              { p: '¿Habrá transporte?', r: 'Sí. Saldrá un autobús del Hotel Boutique Valle a las 4:15 p. m. y habrá regreso a la 1:00 a. m.' },
+              { p: '¿Puedo tomar fotos durante la ceremonia?', r: 'Te pedimos una ceremonia sin celulares: nuestro fotógrafo capturará cada momento. ¡En la fiesta, todas las que quieras!' },
+              { p: '¿Hasta cuándo puedo confirmar?', r: 'A más tardar el 15 de septiembre, desde esta misma invitación.' },
+            ],
+            pase: true,
+            firma: 'Con amor, Andrea & Rodrigo',
+            fechaLimite: '2027-09-15',
+            whatsapp: '¡Hola {nombre}! 💍 Nos casamos y nos encantaría que nos acompañes. Aquí está tu invitación: {enlace}',
+          },
+        },
       ],
       guests: {
+        'andrea-rodrigo': [
+          Object.assign(g('Bd5kRt8mWq3Z', 'Familia Ortiz Ochoa', 'Mariana Ortiz, Daniel Ochoa', 2, '6645556677', 'pendiente', 0, '', '', '', d(3)), { mesa: '2' }),
+          Object.assign(g('Bd2nHs6vLp9Y', 'Tía Carmen', '', 2, '6646667788', 'confirmó', 2, '', '¡Qué emoción, ahí estaremos! 💐', d(1), d(3)), { mesa: '4', extras: { alergias: 'Sin gluten', cancion: 'La Bikina' } }),
+          g('Bd8qJx4cTn7M', 'Familia Salas', '', 4, '', 'pendiente', 0, '', '', '', ''),
+        ],
+        'camila-xv': [
+          g('Az4mQr8tLp2W', 'Familia Núñez Ibarra', 'Gabriela Núñez, Fernando Ibarra, Sofía Ibarra', 3, '6643334455', 'pendiente', 0, '', '', '', d(4)),
+          g('Az7nWs2kVd9H', 'Valeria Ortega', '', 2, '6644445566', 'confirmó', 2, '', '¡Ahí estaré, amiga! 💙', d(1), d(4)),
+        ],
         'sofia-xv': [
           g('Xv7kPq2mNa8R', 'Familia Castillo Ortiz', 'Laura Ortiz, Ricardo Méndez, Emilia Méndez', 3, '6641112233', 'confirmó', 3, 'Laura Ortiz, Ricardo Méndez, Emilia Méndez', '¡No nos lo perdemos, ahijada! 💖', d(2), d(6)),
           g('Xv3dLw9sTe4K', 'Daniela Fuentes', 'Daniela Fuentes, Acompañante', 2, '6642223344', 'pendiente', 0, '', '', '', d(6)),

@@ -110,3 +110,5 @@ blockquote { margin: 6px 0 0; padding: 6px 10px; border-left: 3px solid var(--li
   .brand.sm { font-size: 1.8rem; }
   #demoBar { font-size: .75rem; }
 }
+
+.meta.warn { color: #a5741f; }

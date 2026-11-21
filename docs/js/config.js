@@ -8,6 +8,8 @@ window.APP_CONFIG = {
     espacial: { nombre: 'Aventura espacial', para: 'Niño · cumpleaños' },
     jardin: { nombre: 'Jardín de mariposas', para: 'Niña · cumpleaños' },
     xv: { nombre: 'XV años · Rosa y oro', para: 'Quince años' },
+    'xv-azul': { nombre: 'XV años · Azul acuarela', para: 'Quince años' },
+    boda: { nombre: 'Boda · Jardín al atardecer', para: 'Boda' },
   },
   TIPOS: { cumpleanos: 'Cumpleaños', xv: 'XV años', boda: 'Boda', bautizo: 'Bautizo', otro: 'Otro' },
 };

@@ -27,7 +27,7 @@
 
   if (API.isDemo) {
     const bar = $('#demoBar'); bar.hidden = false;
-    bar.innerHTML = `<strong>Modo demo</strong> · los datos se guardan solo en este navegador. Super usuario: <code>admin / admin123</code> · Clientes: <code>familia.mateo / mateo123</code>, <code>familia.vale / vale123</code>, <code>familia.sofia / sofia123</code> <button id="resetDemo" class="link">Reiniciar demo</button>`;
+    bar.innerHTML = `<strong>Modo demo</strong> · los datos se guardan solo en este navegador. Super usuario: <code>admin / admin123</code> · Clientes: <code>familia.mateo / mateo123</code>, <code>familia.vale / vale123</code>, <code>familia.sofia / sofia123</code> <button id="resetDemo" class="link">Reiniciar demo</button>${API.forcedDemo ? ' · <a class="link" href="panel.html">Salir del demo</a>' : ''}`;
     $('#resetDemo').onclick = () => { API.resetDemo(); API.setSession(null); location.hash = ''; route(); U.toast('Demo reiniciada', 'ok'); };
   }
 
@@ -165,10 +165,22 @@
   function defaultConfig(festejado, edad, tipo, fecha, tema) {
     const d = U.parseDate(fecha); const lim = d ? new Date(d.getTime() - 10 * 864e5) : null;
     const espacial = tema === 'espacial';
+    if (tipo === 'boda') return {
+      tipo, festejado, edad: '', encabezado: 'Nos casamos',
+      frase: 'Con la bendición de Dios y de nuestros padres, queremos compartir contigo el día en que uniremos nuestras vidas.',
+      cita: '', fecha, duracionHoras: 8, fotoPortada: '', galeria: [], historia: [], pase: true, rsvpPreguntas: { alergias: true, cancion: true },
+      faq: [{ p: '¿Pueden ir niños?', r: '' }, { p: '¿Habrá estacionamiento?', r: '' }],
+      musica: 'https://upload.wikimedia.org/wikipedia/commons/c/c6/Canon_in_D_Major_(ISRC_USUAN1100301).mp3', musicaCredito: 'Canon in D Major — Kevin MacLeod (incompetech.com), CC BY 3.0',
+      padres: [{ titulo: 'Padres de la novia', nombres: [] }, { titulo: 'Padres del novio', nombres: [] }, { titulo: 'Padrinos', nombres: [] }],
+      lugares: [{ titulo: 'Ceremonia religiosa', hora: '', nombre: '', direccion: '', mapa: '', croquis: '' }, { titulo: 'Recepción', hora: '', nombre: '', direccion: '', mapa: '', croquis: '' }],
+      horario: [], vestimenta: 'Formal', regalos: '', firma: '',
+      fechaLimite: lim ? lim.toISOString().slice(0, 10) : '',
+      whatsapp: '¡Hola {nombre}! 💍 Nos casamos y nos encantaría que nos acompañes. Aquí está tu invitación: {enlace}',
+    };
     if (tipo === 'xv') return {
       tipo, festejado, edad: '', encabezado: 'Mis XV años',
       frase: 'Hay momentos que se esperan toda la vida. Quiero compartir contigo el inicio de esta nueva etapa.',
-      cita: '', fecha, duracionHoras: 7, fotoPortada: '', galeria: [], musica: '',
+      cita: '', fecha, duracionHoras: 7, fotoPortada: '', galeria: [], musica: 'cajita', pase: true,
       padres: [{ titulo: 'Mis padres', nombres: [] }, { titulo: 'Mis padrinos', nombres: [] }],
       lugares: [{ titulo: 'Misa de acción de gracias', hora: '', nombre: '', direccion: '', mapa: '', croquis: '' }, { titulo: 'Recepción', hora: '', nombre: '', direccion: '', mapa: '', croquis: '' }],
       horario: [], vestimenta: 'Formal', regalos: '', firma: '',
@@ -256,6 +268,7 @@
             <label>Personas (opcional, separadas por coma)<input name="personas" placeholder="Leo, Camila, Ana"></label>
             <div class="row2"><label>Lugares<input name="lugares" type="number" min="1" max="20" value="2"></label>
             <label>WhatsApp (opcional)<input name="telefono" placeholder="664… o +1…"></label></div>
+            <label>Mesa (opcional, aparece en su pase)<input name="mesa" placeholder="Ej. 4"></label>
             <button class="btn primary block">Crear invitación</button>
             <p class="hint">Si escribes personas, cada una aparece con su casilla. Si no, el invitado elige cuántos asistirán.</p>
           </form>
@@ -294,7 +307,7 @@
     $('#newGuest').onsubmit = async (e) => {
       e.preventDefault(); const f = e.target;
       try {
-        const g = await API.call('saveGuest', { e: ev.id, invitado: { nombre: f.nombre.value, personas: f.personas.value, lugares: f.lugares.value, telefono: f.telefono.value } });
+        const g = await API.call('saveGuest', { e: ev.id, invitado: { nombre: f.nombre.value, personas: f.personas.value, lugares: f.lugares.value, telefono: f.telefono.value, mesa: f.mesa.value } });
         S.guests.unshift(g); f.reset(); f.lugares.value = 2;
         renderStats(); renderGuests(); U.toast('Invitación creada', 'ok');
       } catch (err) { handleErr(err); }
@@ -308,10 +321,10 @@
   }
 
   function renderStats() {
-    const r = { inv: S.guests.length, si: 0, no: 0, pend: 0, lugares: 0, personas: 0, enviadas: 0 };
+    const r = { inv: S.guests.length, si: 0, no: 0, pend: 0, lugares: 0, personas: 0, enviadas: 0, alergias: 0, canciones: 0 };
     S.guests.forEach(g => {
       r.lugares += +g.lugares || 0; if (g.enviado) r.enviadas++;
-      if (g.estado === 'confirmó') { r.si++; r.personas += +g.confirmados || 0; } else if (g.estado === 'declinó') r.no++; else r.pend++;
+      if (g.estado === 'confirmó') { r.si++; r.personas += +g.confirmados || 0; if (ex(g).alergias) r.alergias++; if (ex(g).cancion) r.canciones++; } else if (g.estado === 'declinó') r.no++; else r.pend++;
     });
     const p = (n) => r.inv ? Math.round(n / r.inv * 100) : 0;
     $('#stats').innerHTML = `
@@ -323,6 +336,8 @@
         <div><dt><i class="dot r"></i>Declinaron</dt><dd>${r.no} (${p(r.no)}%)</dd></div>
         <div><dt><i class="dot"></i>Sin responder</dt><dd>${r.pend} (${p(r.pend)}%)</dd></div>
         <div class="hl"><dt>Personas confirmadas</dt><dd>${r.personas} de ${r.lugares} lugares</dd></div>
+        ${r.alergias ? `<div><dt>⚠️ Con alergias o restricciones</dt><dd>${r.alergias}</dd></div>` : ''}
+        ${r.canciones ? `<div><dt>🎵 Canciones pedidas</dt><dd>${r.canciones}</dd></div>` : ''}
       </dl>`;
     const gc = $('#gCount'); if (gc) gc.textContent = S.guests.length;
   }
@@ -347,6 +362,9 @@
           <p class="meta">${g.lugares} ${g.lugares == 1 ? 'lugar' : 'lugares'}${g.estado === 'confirmó' ? ` · <b>${g.confirmados} asistirán</b>` : ''}${g.personas ? ' · ' + esc(g.personas) : ''}</p>
           ${g.estado === 'confirmó' && g.detalle ? `<p class="meta">✔ ${esc(g.detalle)}</p>` : ''}
           <p class="meta">${g.creado ? 'Creada ' + esc(U.fmtShort(g.creado)) : ''}${g.enviado ? ' · ✉ Enviada ' + esc(U.fmtShort(g.enviado)) : ''}${g.respondido ? ' · Respondió ' + esc(U.fmtShort(g.respondido)) : ''}</p>
+          ${g.mesa ? `<p class="meta">🪑 Mesa ${esc(g.mesa)}</p>` : ''}
+          ${ex(g).alergias ? `<p class="meta warn">⚠️ Alergias / restricciones: <b>${esc(ex(g).alergias)}</b></p>` : ''}
+          ${ex(g).cancion ? `<p class="meta">🎵 Canción: ${esc(ex(g).cancion)}</p>` : ''}
           ${g.mensaje ? `<blockquote>“${esc(g.mensaje)}”</blockquote>` : ''}
         </div>
       </div>
@@ -364,11 +382,14 @@
           <label>Personas<input name="personas" value="${esc(g.personas)}"></label>
           <div class="row2"><label>Lugares<input name="lugares" type="number" min="1" max="20" value="${esc(g.lugares)}"></label>
           <label>WhatsApp<input name="telefono" value="${esc(g.telefono)}"></label></div>
+          <label>Mesa<input name="mesa" value="${esc(g.mesa || '')}"></label>
           <button class="btn sm primary">Guardar</button>
         </form>
       </details>`}
     </article>`;
   }
+
+  function ex(g) { if (g.extras && typeof g.extras === 'object') return g.extras; try { return JSON.parse(g.extras || '{}'); } catch (e) { return {}; } }
 
   function bindGuest(card) {
     const g = S.guests.find(x => x.token === card.dataset.t); if (!g) return;
@@ -397,7 +418,7 @@
     $('form', card).onsubmit = async (e) => {
       e.preventDefault(); const f = e.target;
       try {
-        Object.assign(g, await API.call('saveGuest', { e: S.ev.id, invitado: { token: g.token, nombre: f.nombre.value, personas: f.personas.value, lugares: f.lugares.value, telefono: f.telefono.value } }));
+        Object.assign(g, await API.call('saveGuest', { e: S.ev.id, invitado: { token: g.token, nombre: f.nombre.value, personas: f.personas.value, lugares: f.lugares.value, telefono: f.telefono.value, mesa: f.mesa.value } }));
         S.openGuest = null; renderStats(); renderGuests(); U.toast('Guardado', 'ok');
       } catch (err) { handleErr(err); }
     };
@@ -421,16 +442,37 @@
         <div id="placesBox">${placesOf(c).map(placeFields).join('')}</div>
         <button type="button" class="btn sm" id="addPlace">+ Agregar lugar</button>
       </fieldset>
+      <label>Nuestra historia (una línea por momento: <code>fecha | título | texto | foto</code>)<textarea name="historia" rows="3" placeholder="2019 | Nos conocimos | Una tarde de verano… | fotos/historia-1.jpg">${esc((c.historia || []).map(h => [h.fecha, h.titulo, h.texto, h.foto].map(x => x || '').join(' | ')).join('\n'))}</textarea></label>
       <label>Padres y padrinos (una línea por grupo: <code>Título: nombre, nombre</code>)<textarea name="padres" rows="3" placeholder="Mis padres: Mónica Ramírez, Javier Castillo">${esc((c.padres || []).map(p => (p.titulo || '') + ': ' + (p.nombres || []).join(', ')).join('\n'))}</textarea></label>
       <fieldset><legend>Fotos y música</legend>
         <label>Foto principal<input name="fotoPortada" value="${esc(c.fotoPortada)}" placeholder="fotos/portada.jpg o enlace de Google Drive"></label>
         <label>Galería (un enlace por línea)<textarea name="galeria" rows="4" placeholder="fotos/1.jpg">${esc((c.galeria || []).join('\n'))}</textarea></label>
         <label>Música<input name="musica" value="${esc(c.musica)}" placeholder="musica/cancion.mp3 · enlace .mp3 · cajita"></label>
+        <label>Crédito de la música (si la licencia lo pide)<input name="musicaCredito" value="${esc(c.musicaCredito)}" placeholder="Canción — Autor (sitio), licencia"></label>
         <p class="hint">Sube las fotos a <code>docs/fotos/</code> y la canción a <code>docs/musica/</code> en GitHub, o pega enlaces de Google Drive compartidos como "Cualquier persona con el enlace". Escribe <code>cajita</code> para usar la caja musical incluida.</p>
       </fieldset>
       <label>Itinerario (una línea por actividad: <code>hora | actividad</code>)<textarea name="horario" rows="4">${esc(horario)}</textarea></label>
       <label>Vestimenta<input name="vestimenta" value="${esc(c.vestimenta)}"></label>
-      <label>Regalos<input name="regalos" value="${esc(c.regalos)}"></label>
+      <div class="row2"><label>Paleta sugerida (colores separados por coma)<input name="paleta" value="${esc((c.paleta || []).join(', '))}" placeholder="#e9dfd3, #9fa8a3"></label>
+      <label>Color reservado<input name="res_color" type="color" value="${esc((c.reservado && c.reservado.color) || '#9fc3ea')}"></label></div>
+      <label class="inline"><input type="checkbox" name="res_on" ${c.reservado ? 'checked' : ''}> Mostrar color reservado</label>
+      <label>Texto del color reservado<input name="res_texto" value="${esc((c.reservado && c.reservado.texto) || '')}" placeholder="El azul está reservado para la quinceañera"></label>
+      <label>Regalos (texto)<input name="regalos" value="${esc(c.regalos)}"></label>
+      <fieldset><legend>Mesa de regalos y lluvia de sobres</legend>
+        <label>Mesas de regalos (una por línea: <code>tienda | número | enlace</code>)<textarea name="mesas" rows="2" placeholder="Liverpool | 51234567 | https://…">${esc((c.mesaRegalos || []).map(m => [m.tienda, m.numero, m.url].map(x => x || '').join(' | ')).join('\n'))}</textarea></label>
+        <div class="row2"><label>Banco<input name="sb_banco" value="${esc((c.sobres || {}).banco)}"></label><label>Titular<input name="sb_titular" value="${esc((c.sobres || {}).titular)}"></label></div>
+        <label>CLABE<input name="sb_clabe" value="${esc((c.sobres || {}).clabe)}" inputmode="numeric"></label>
+        <label>Nota<input name="sb_nota" value="${esc((c.sobres || {}).nota)}"></label>
+      </fieldset>
+      <fieldset><legend>Extras premium</legend>
+        <div class="row2"><label>Hashtag<input name="hashtag" value="${esc(c.hashtag)}" placeholder="#CamilaXV"></label><label>Álbum compartido (enlace)<input name="album" value="${esc(c.album)}" placeholder="https://photos.app.goo.gl/…"></label></div>
+        <label>Fotos a lo ancho entre secciones (hasta 3, una por línea: <code>foto | frase | firma</code>)<textarea name="separadores" rows="3" placeholder="fotos/sep-1.jpg | Hoy empieza mi historia | Camila">${esc((c.separadores || []).map(x => [x.foto, x.texto, x.autor].map(y => y || '').join(' | ')).join('\n'))}</textarea></label>
+        <label class="inline"><input type="checkbox" name="pase" ${c.pase ? 'checked' : ''}> Pase de acceso con código QR al confirmar</label>
+        <label class="inline"><input type="checkbox" name="q_alergias" ${(c.rsvpPreguntas || {}).alergias ? 'checked' : ''}> Preguntar alergias al confirmar</label>
+        <label class="inline"><input type="checkbox" name="q_cancion" ${(c.rsvpPreguntas || {}).cancion ? 'checked' : ''}> Pedir una canción al confirmar</label>
+        <label>Hospedaje (uno por línea: <code>nombre | nota | enlace</code>)<textarea name="hospedaje" rows="2" placeholder="Hotel Centro | A 5 min, código BODA | https://…">${esc((c.hospedaje || []).map(h => [h.nombre, h.nota, h.url].map(x => x || '').join(' | ')).join('\n'))}</textarea></label>
+        <label>Preguntas frecuentes (una por línea: <code>pregunta | respuesta</code>)<textarea name="faq" rows="4" placeholder="¿Pueden ir niños? | Será solo para adultos.">${esc((c.faq || []).map(f => (f.p || '') + ' | ' + (f.r || '')).join('\n'))}</textarea></label>
+      </fieldset>
       <label>Firma<input name="firma" value="${esc(c.firma)}" placeholder="Con cariño, …"></label>
       <label>Confirmar antes de<input name="fechaLimite" type="date" value="${esc(c.fechaLimite)}"></label>
       <label>Mensaje de WhatsApp <span class="hint">({nombre}, {festejado}, {edad}, {enlace})</span><textarea name="whatsapp" rows="3">${esc(c.whatsapp)}</textarea></label>
@@ -471,6 +513,18 @@
         fotoPortada: f.fotoPortada.value.trim(),
         galeria: f.galeria.value.split('\n').map(x => x.trim()).filter(Boolean),
         musica: f.musica.value.trim(),
+        musicaCredito: f.musicaCredito.value.trim(),
+        paleta: f.paleta.value.split(',').map(x => x.trim()).filter(x => /^#[0-9a-f]{3,8}$/i.test(x)),
+        reservado: f.res_on.checked ? { color: f.res_color.value, texto: f.res_texto.value.trim() } : null,
+        mesaRegalos: f.mesas.value.split('\n').map(x => x.split('|').map(y => y.trim())).filter(p => p[0]).map(p => ({ tienda: p[0], numero: p[1] || '', url: p[2] || '' })),
+        sobres: f.sb_clabe.value.trim() ? { banco: f.sb_banco.value.trim(), titular: f.sb_titular.value.trim(), clabe: f.sb_clabe.value.trim(), nota: f.sb_nota.value.trim() } : null,
+        hashtag: f.hashtag.value.trim(), album: f.album.value.trim(),
+        separadores: f.separadores.value.split('\n').map(x => x.split('|').map(y => y.trim())).filter(p => p[0]).slice(0, 3).map((p, i) => ({ foto: p[0], texto: p[1] || '', autor: p[2] || '', pos: (((S.ev.config || {}).separadores || [])[i] || {}).pos || '' })),
+        pase: f.pase.checked,
+        rsvpPreguntas: { alergias: f.q_alergias.checked, cancion: f.q_cancion.checked },
+        hospedaje: f.hospedaje.value.split('\n').map(x => x.split('|').map(y => y.trim())).filter(p => p[0]).map(p => ({ nombre: p[0], nota: p[1] || '', url: p[2] || '' })),
+        faq: f.faq.value.split('\n').map(x => { const i = x.indexOf('|'); return i < 0 ? { p: x.trim(), r: '' } : { p: x.slice(0, i).trim(), r: x.slice(i + 1).trim() }; }).filter(x => x.p),
+        historia: f.historia.value.split('\n').map(x => x.split('|').map(y => y.trim())).filter(p => p.some(Boolean)).map(p => ({ fecha: p[0] || '', titulo: p[1] || '', texto: p[2] || '', foto: p[3] || '' })),
         horario: f.horario.value.split('\n').map(x => x.split('|')).filter(p => p[0].trim()).map(p => ({ hora: p[0].trim(), texto: (p.slice(1).join('|') || '').trim() })),
         vestimenta: f.vestimenta.value, regalos: f.regalos.value, firma: f.firma.value, fechaLimite: f.fechaLimite.value, whatsapp: f.whatsapp.value,
       });
@@ -481,9 +535,9 @@
 
   // ---------- CSV ----------
   function toCsv() {
-    const cols = ['nombre', 'personas', 'lugares', 'telefono', 'estado', 'confirmados', 'detalle', 'mensaje', 'enviado', 'respondido'];
+    const cols = ['nombre', 'personas', 'lugares', 'mesa', 'telefono', 'estado', 'confirmados', 'detalle', 'alergias', 'cancion', 'mensaje', 'enviado', 'respondido'];
     const q = v => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"';
-    return [cols.join(',')].concat(S.guests.map(g => cols.map(c => q(g[c])).join(','))).join('\n');
+    return [cols.join(',')].concat(S.guests.map(g => cols.map(c => q(c === 'alergias' || c === 'cancion' ? ex(g)[c] : g[c])).join(','))).join('\n');
   }
 
   // Botón de confirmación en dos clics (sin diálogos del navegador)

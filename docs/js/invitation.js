@@ -45,12 +45,14 @@
     const lugares = places(cfg);
     const galeria = (cfg.galeria || []).map(U.img).filter(Boolean);
     const padres = (cfg.padres || []).filter(p => p && p.nombres && p.nombres.length);
+    const historia = (cfg.historia || []).filter(h => h && (h.titulo || h.texto || h.foto));
     document.title = cfg.festejado ? 'Invitación · ' + cfg.festejado : 'Invitación';
     const tipoTxt = { cumpleanos: 'cumpleaños', xv: 'XV años', boda: 'boda', bautizo: 'bautizo' }[cfg.tipo] || 'celebración';
 
     $('#app').innerHTML = `
       ${cover(cfg, inv, th)}
       <main class="inv">
+        ${th.fullHero ? `<section class="hero">${th.hero(cfg)}<div class="scroll-hint" aria-hidden="true"><span></span></div></section>` : `
         <section class="hero">
           <div class="hero-art">${th.hero ? th.hero(cfg) : (U.img(cfg.fotoPortada) ? `<img class="hero-photo" src="${esc(U.img(cfg.fotoPortada))}" alt="">` : '')}</div>
           <p class="kicker">${esc(cfg.encabezado || '¡Estás invitado!')}</p>
@@ -58,9 +60,23 @@
           ${th.hideAge ? '' : cfg.edad ? `<div class="age"><span class="age-label">cumple</span><span class="age-num">${esc(cfg.edad)}</span><span class="age-label">${Number(cfg.edad) === 1 ? 'año' : 'años'}</span></div>` : `<p class="age-label solo">${esc(tipoTxt)}</p>`}
           ${cfg.frase ? `<p class="lead">${esc(cfg.frase)}</p>` : ''}
           <div class="scroll-hint" aria-hidden="true"><span></span></div>
-        </section>
+        </section>`}
 
         ${cfg.cita ? `<section class="quote reveal">${th.quoteOrnament || ''}<p>${esc(cfg.cita)}</p></section>` : ''}
+
+        ${historia.length ? `
+        <section class="story reveal">
+          ${th.storyOrnament || ''}
+          <h2 class="sec-title">${esc(L.story || 'Nuestra historia')}</h2>
+          <div class="st-list">
+            ${historia.map(h => `<article class="st-item">
+              ${U.img(h.foto) ? `<button class="st-photo" data-photo="${esc(U.img(h.foto))}" aria-label="Ver foto"><img src="${esc(U.img(h.foto))}" alt="" loading="lazy"></button>` : ''}
+              <div class="st-text">${h.fecha ? `<p class="st-date">${esc(h.fecha)}</p>` : ''}${h.titulo ? `<h3>${esc(h.titulo)}</h3>` : ''}${h.texto ? `<p>${esc(h.texto)}</p>` : ''}</div>
+            </article>`).join('')}
+          </div>
+        </section>` : ''}
+
+        ${sep(cfg, 0)}
 
         ${fecha ? `
         <section class="card countdown reveal">
@@ -89,12 +105,23 @@
           ${lugares.map((l, k) => placeHtml(l, k)).join('')}
         </section>` : ''}
 
+        ${(cfg.hospedaje || []).filter(h => h && h.nombre).length ? `
+        <section class="card stay reveal">
+          ${deco(th, 'stay')}
+          <div class="note-ico">${icon('bed')}</div>
+          <h2 class="sec-title">${esc(L.stay || 'Hospedaje')}</h2>
+          <p>${esc(cfg.hospedajeTexto || 'Si vienes de fuera, estas opciones están cerca del lugar.')}</p>
+          ${cfg.hospedaje.filter(h => h && h.nombre).map(h => `<div class="gift-row"><div><strong>${esc(h.nombre)}</strong>${h.nota ? `<span>${esc(h.nota)}</span>` : ''}</div>${safeUrl(h.url) ? `<a class="btn sm" href="${esc(h.url)}" target="_blank" rel="noopener">Ver</a>` : ''}</div>`).join('')}
+        </section>` : ''}
+
+        ${sep(cfg, 1)}
+
         ${Array.isArray(cfg.horario) && cfg.horario.length ? `
         <section class="card schedule reveal">
           ${deco(th, 'schedule')}
           <h2 class="sec-title">${esc(L.schedule || 'Itinerario')}</h2>
           <ol class="timeline">
-            ${cfg.horario.map(h => `<li><span class="t-dot"></span><span class="t-time">${esc(h.hora)}</span><span class="t-text">${esc(h.texto)}</span></li>`).join('')}
+            ${cfg.horario.map(h => { const ic = scheduleIcon(h); return `<li class="${ic ? 'has-ico' : ''}"><span class="t-dot">${ic}</span><span class="t-time">${esc(h.hora)}</span><span class="t-text">${esc(h.texto)}</span></li>`; }).join('')}
           </ol>
         </section>` : ''}
 
@@ -111,12 +138,50 @@
           </div>
         </section>` : ''}
 
-        ${cfg.vestimenta || cfg.regalos ? `
+        ${cfg.vestimenta || cfg.paleta ? `
         <section class="card notes reveal">
           ${deco(th, 'notes')}
-          ${cfg.vestimenta ? `<div class="note"><div class="note-ico">${icon('shirt')}</div><h3>${esc(L.dress || 'Vestimenta')}</h3><p>${esc(cfg.vestimenta)}</p></div>` : ''}
-          ${cfg.regalos ? `<div class="note"><div class="note-ico">${icon('gift')}</div><h3>${esc(L.gifts || 'Regalos')}</h3><p>${esc(cfg.regalos)}</p></div>` : ''}
+          <div class="note"><div class="note-ico">${icon('shirt')}</div><h3>${esc(L.dress || 'Vestimenta')}</h3>${cfg.vestimenta ? `<p>${esc(cfg.vestimenta)}</p>` : ''}
+          ${paletaHtml(cfg)}</div>
         </section>` : ''}
+
+        ${cfg.regalos || (cfg.mesaRegalos && cfg.mesaRegalos.length) || (cfg.sobres && cfg.sobres.clabe) ? `
+        <section class="card gifts reveal">
+          ${deco(th, 'gifts')}
+          <div class="note-ico">${icon('gift')}</div>
+          <h2 class="sec-title">${esc(L.gifts || 'Regalos')}</h2>
+          ${cfg.regalos ? `<p>${esc(cfg.regalos)}</p>` : ''}
+          ${(cfg.mesaRegalos || []).filter(m => m && m.tienda).map(m => `<div class="gift-row"><div><strong>${esc(m.tienda)}</strong>${m.numero ? `<span>Evento ${esc(m.numero)}</span>` : ''}</div>${safeUrl(m.url) ? `<a class="btn sm" href="${esc(m.url)}" target="_blank" rel="noopener">Ver mesa</a>` : m.numero ? `<button class="btn ghost sm" data-copy="${esc(m.numero)}">Copiar número</button>` : ''}</div>`).join('')}
+          ${cfg.sobres && cfg.sobres.clabe ? `<div class="envelope-box">
+            <p class="env-title">${icon('mail')} Lluvia de sobres</p>
+            ${cfg.sobres.nota ? `<p class="small">${esc(cfg.sobres.nota)}</p>` : ''}
+            <dl class="bank">
+              ${cfg.sobres.banco ? `<div><dt>Banco</dt><dd>${esc(cfg.sobres.banco)}</dd></div>` : ''}
+              ${cfg.sobres.titular ? `<div><dt>Titular</dt><dd>${esc(cfg.sobres.titular)}</dd></div>` : ''}
+              <div><dt>CLABE</dt><dd class="mono">${esc(cfg.sobres.clabe)}</dd></div>
+            </dl>
+            <button class="btn sm" data-copy="${esc(String(cfg.sobres.clabe).replace(/\s/g, ''))}">${icon('copy')} Copiar CLABE</button>
+          </div>` : ''}
+        </section>` : ''}
+
+        ${cfg.hashtag || cfg.album ? `
+        <section class="card social reveal">
+          ${deco(th, 'social')}
+          <div class="note-ico">${icon('camera')}</div>
+          <h2 class="sec-title">${esc(L.social || 'Comparte tus fotos')}</h2>
+          <p>${esc(cfg.hashtagTexto || 'Usa nuestro hashtag para que todos los recuerdos queden juntos.')}</p>
+          ${cfg.hashtag ? `<button class="hashtag" data-copy="${esc(cfg.hashtag)}">${esc(cfg.hashtag)}<small>Toca para copiar</small></button>` : ''}
+          ${safeUrl(cfg.album) ? `<a class="btn sm" href="${esc(cfg.album)}" target="_blank" rel="noopener">${icon('camera')} Subir mis fotos</a>` : ''}
+        </section>` : ''}
+
+        ${(cfg.faq || []).filter(f => f && f.p).length ? `
+        <section class="card faq reveal">
+          ${deco(th, 'faq')}
+          <h2 class="sec-title">${esc(L.faq || 'Preguntas frecuentes')}</h2>
+          <div class="faq-list">${cfg.faq.filter(f => f && f.p).map(f => `<details class="faq-item"><summary>${esc(f.p)}</summary><p>${esc(f.r || '')}</p></details>`).join('')}</div>
+        </section>` : ''}
+
+        ${sep(cfg, 2)}
 
         <section class="card rsvp reveal" id="rsvp">
           ${deco(th, 'rsvp')}
@@ -126,6 +191,7 @@
         <footer class="foot reveal">
           ${cfg.firma ? `<p class="firma">${esc(cfg.firma)}</p>` : ''}
           ${th.footer ? th.footer(cfg) : ''}
+          ${cfg.musica && cfg.musicaCredito ? `<p class="music-credit">♪ ${esc(cfg.musicaCredito)}</p>` : ''}
         </footer>
       </main>
       ${cfg.musica ? `<button class="music-btn" id="musicBtn" aria-label="Música" aria-pressed="false"><span class="m-ico">${icon('note')}</span><span class="m-bars"><i></i><i></i><i></i></span></button>` : ''}
@@ -140,11 +206,85 @@
     if (cfg.musica) Music.init(cfg.musica);
     bindCover();
     bindRsvp();
+    drawQr();
     bindPlaces();
     bindGallery(galeria);
+    bindCopy();
+    parallax();
     startCountdown(fecha);
     reveal();
     document.body.classList.remove('loading');
+  }
+
+  // Foto a lo ancho entre secciones, con frase opcional y efecto parallax
+  function sep(cfg, k) {
+    const s = (cfg.separadores || [])[k];
+    if (!s || !U.img(s.foto)) return '';
+    return `<section class="sep" aria-hidden="${s.texto ? 'false' : 'true'}">
+      <div class="sep-img" style="background-image:url('${esc(U.img(s.foto))}');background-position:${esc(s.pos || '50% 40%')}"></div>
+      ${s.texto ? `<div class="sep-text reveal"><p>${esc(s.texto)}</p>${s.autor ? `<span>${esc(s.autor)}</span>` : ''}</div>` : ''}
+    </section>`;
+  }
+
+  function paletaHtml(cfg) {
+    const pal = (cfg.paleta || []).filter(c => /^#[0-9a-f]{3,8}$/i.test(c));
+    const res = cfg.reservado && /^#[0-9a-f]{3,8}$/i.test(cfg.reservado.color) ? cfg.reservado : null;
+    if (!pal.length && !res) return '';
+    return `<div class="palette">
+      ${pal.length ? `<p class="pal-lbl">Colores sugeridos</p><div class="swatches">${pal.map(c => `<span class="sw" style="background:${c}"></span>`).join('')}</div>` : ''}
+      ${res ? `<p class="pal-res"><span class="sw res" style="background:${res.color}"></span>${esc(res.texto || 'Color reservado para la festejada')}</p>` : ''}
+    </div>`;
+  }
+
+  function scheduleIcon(h) {
+    const t = (h.icono || h.texto || '').toLowerCase();
+    const map = [[/misa|ceremonia|iglesia|parroquia/, 'church'], [/recep|bienvenida|llegada|cóctel|coctel/, 'cheers'], [/vals|baile|bailar|fiesta|pista/, 'dance'],
+      [/cena|comida|taquiza|banquete/, 'dinner'], [/brindis/, 'cheers'], [/pastel|mañanitas/, 'cake'], [/foto/, 'camera'], [/despedida|fin|cierre/, 'moon']];
+    const m = map.find(([re]) => re.test(t));
+    return m ? icon(m[1]) : '';
+  }
+
+  function bindCopy() {
+    document.addEventListener('click', async (e) => {
+      const b = e.target.closest('[data-copy]'); if (!b) return;
+      (await U.copy(b.dataset.copy)) ? U.toast('¡Copiado!', 'ok') : U.toast(b.dataset.copy);
+    });
+  }
+
+  function parallax() {
+    const imgs = $$('.sep-img'); if (!imgs.length || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    let ticking = false;
+    const run = () => {
+      const vh = innerHeight;
+      imgs.forEach(el => { const r = el.parentNode.getBoundingClientRect(); if (r.bottom > 0 && r.top < vh) el.style.transform = `translate3d(0, ${((r.top + r.height / 2 - vh / 2) * -0.18).toFixed(1)}px, 0) scale(1.18)`; });
+      ticking = false;
+    };
+    addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(run); } }, { passive: true });
+    run();
+  }
+
+  // Pase digital con QR (aparece al confirmar)
+  function passHtml(cfg, inv) {
+    const d = U.parseDate(cfg.fecha);
+    return `<div class="pass" id="pass">
+      <div class="pass-top"><p class="pass-kicker">Pase de acceso</p><p class="pass-event">${esc(cfg.tipo === 'xv' ? 'XV años de ' + (cfg.festejado || '') : cfg.festejado || '')}</p></div>
+      <div class="pass-body">
+        <div class="pass-qr" id="passQr" aria-label="Código QR"></div>
+        <div class="pass-info">
+          <p><span>Invitado</span><strong>${esc(inv.nombre)}</strong></p>
+          <p><span>Personas</span><strong>${inv.confirmados}</strong></p>
+          ${d ? `<p><span>Fecha</span><strong>${esc(d.toLocaleDateString('es-MX', { day: 'numeric', month: 'short', year: 'numeric' }))}</strong></p>` : ''}
+          ${inv.mesa ? `<p><span>Mesa</span><strong>${esc(inv.mesa)}</strong></p>` : ''}
+        </div>
+      </div>
+      <p class="pass-foot">Presenta este pase en la entrada · toma captura de pantalla</p>
+    </div>`;
+  }
+  function drawQr() {
+    const box = $('#passQr'); if (!box) return;
+    const text = location.href;
+    const paint = () => { try { box.innerHTML = QR.svg(text, { level: 'M' }); } catch (e) { box.innerHTML = '<span class="small">QR</span>'; } };
+    if (window.QR) paint(); else U.loadJs('js/qr.js').then(paint).catch(() => { box.innerHTML = '<span class="small">QR</span>'; });
   }
 
   function deco(th, where) { return th.deco && th.deco[where] ? `<div class="deco deco-${where}" aria-hidden="true">${th.deco[where]}</div>` : ''; }
@@ -176,6 +316,7 @@
       box.hidden = false; b.classList.add('on');
     }));
     $$('[data-croquis]').forEach(b => b.addEventListener('click', () => Lightbox.open([b.dataset.croquis], 0)));
+    $$('[data-photo]').forEach(b => b.addEventListener('click', () => Lightbox.open([b.dataset.photo], 0)));
   }
 
   // ---------- Galería + visor ----------
@@ -237,12 +378,15 @@
   function bindCover() {
     const c = $('#cover');
     document.body.classList.add('covered');
+    const art = $('.cover-art', c);
+    if (art) art.addEventListener('click', () => $('#openCover').click());
     $('#openCover').addEventListener('click', () => {
+      if (c.classList.contains('opening')) return;
       c.classList.add('opening');
       document.body.classList.remove('covered');
       if (state.theme.onOpen) state.theme.onOpen();
       Music.play(); // el clic del invitado permite iniciar el audio
-      setTimeout(() => c.remove(), 1100);
+      setTimeout(() => c.remove(), state.theme.coverDelay || 1100);
     });
   }
 
@@ -270,6 +414,7 @@
           <p>${ok ? `Te esperamos: <strong>${inv.confirmados} ${inv.confirmados === 1 ? 'persona' : 'personas'}</strong>${inv.detalle.length ? ' (' + esc(inv.detalle.join(', ')) + ')' : ''}.` : '¡Te vamos a extrañar!'}</p>
           ${inv.mensaje ? `<blockquote>“${esc(inv.mensaje)}”</blockquote>` : ''}
         </div>
+        ${ok && cfg.pase ? passHtml(cfg, inv) : ''}
         <p class="small muted center">Tu respuesta quedó registrada. Si necesitas hacer algún cambio, comunícate con los anfitriones.</p>`;
     }
 
@@ -283,6 +428,8 @@
         <div class="rsvp-review">
           <p class="rsvp-done-title">${p.asistira ? '¿Confirmamos tu asistencia?' : '¿Enviamos que no podrás asistir?'}</p>
           ${p.asistira ? `<p><strong>${n} ${n === 1 ? 'persona' : 'personas'}</strong>${p.asisten ? ': ' + esc(p.asisten.join(', ')) : ''}</p>` : ''}
+          ${p.asistira && p.extras && p.extras.alergias ? `<p class="small">Alergias o restricciones: <strong>${esc(p.extras.alergias)}</strong></p>` : ''}
+          ${p.asistira && p.extras && p.extras.cancion ? `<p class="small">Canción: <strong>${esc(p.extras.cancion)}</strong></p>` : ''}
           ${p.mensaje ? `<blockquote>“${esc(p.mensaje)}”</blockquote>` : ''}
           <p class="small">Una vez enviada, <strong>tu respuesta ya no se podrá cambiar.</strong></p>
         </div>
@@ -304,6 +451,8 @@
     return `${head}
       <form class="rsvp-form" id="rsvpForm">
         ${people}
+        ${(cfg.rsvpPreguntas || {}).alergias ? `<label class="field"><span>¿Alguna alergia o restricción alimentaria? (opcional)</span><input name="alergias" maxlength="300" placeholder="Vegetariano, sin gluten, alergia a nueces…"></label>` : ''}
+        ${(cfg.rsvpPreguntas || {}).cancion ? `<label class="field"><span>¿Qué canción no puede faltar en la fiesta? (opcional)</span><input name="cancion" maxlength="150" placeholder="Canción y artista"></label>` : ''}
         <label class="field"><span>Mensaje para ${esc(cfg.festejado || 'los anfitriones')} (opcional)</span>
           <textarea name="mensaje" rows="2" maxlength="500" placeholder="¡Escribe algo bonito!"></textarea></label>
         <div class="btn-col">
@@ -345,7 +494,8 @@
     form.addEventListener('submit', (ev) => {
       ev.preventDefault();
       const asistira = choice === 'si';
-      const body = { e: state.evento.id, i: state.invitado.token, asistira, mensaje: form.mensaje.value.trim() };
+      const body = { e: state.evento.id, i: state.invitado.token, asistira, mensaje: form.mensaje.value.trim(),
+        extras: { alergias: form.alergias ? form.alergias.value.trim() : '', cancion: form.cancion ? form.cancion.value.trim() : '' } };
       if (state.invitado.personas.length) body.asisten = $$('input[name=p]:checked', form).map(x => x.value);
       else body.cantidad = +$('#qty').textContent;
       if (asistira && ((body.asisten && !body.asisten.length) || body.cantidad === 0)) {
@@ -363,6 +513,7 @@
   function rerenderRsvp() {
     $('#rsvpBody').innerHTML = rsvpHtml(state.evento.config, state.invitado);
     bindRsvp();
+    drawQr();
   }
 
   // ---------- Música ----------
@@ -495,6 +646,16 @@
       check: '<path d="M5 12.5l4.5 4.5L19 7.5"/>',
       heart: '<path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/>',
       note: '<path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/>',
+      mail: '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/>',
+      copy: '<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/>',
+      bed: '<path d="M3 18V7M3 14h18v4M21 18v-4a3 3 0 0 0-3-3h-7v3M7 11.5a1.5 1.5 0 1 0 0-.01"/>',
+      camera: '<path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/>',
+      church: '<path d="M12 2v4M10 4h4M12 6l-6 5v10h12V11l-6-5zM10 21v-5h4v5"/>',
+      cheers: '<path d="M7 3h5l-1 7a2.5 2.5 0 0 1-3 0L7 3zM9.5 10.5V18M7 18h5M17 5h-4l1 6a2 2 0 0 0 2.5 0L17 5zM15.2 11.5V19M13 19h4.5"/>',
+      dance: '<circle cx="12" cy="4" r="2"/><path d="M12 6l-1 6 3 4-1 6M11 12l-4 2M12 8l4 3M10 16l-3 6"/>',
+      dinner: '<path d="M4 3v8a2 2 0 0 0 2 2v8M8 3v8a2 2 0 0 1-2 2M6 3v6M17 3c-2 2-2 6 0 8v10"/>',
+      cake: '<path d="M4 21h16v-8H4zM4 16c2 1.5 4 1.5 6 0s4-1.5 6 0 4 1.5 4 0M12 13V9M12 6.5a1 1 0 0 0 0-2.5c-.5 1-1 1.5 0 2.5z"/>',
+      moon: '<path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/>',
     }[n] || '';
     return `<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
   }

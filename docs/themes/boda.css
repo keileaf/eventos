@@ -1,0 +1,127 @@
+/* Tema: Boda · Jardín al atardecer */
+body.theme-boda {
+  --bg: #fbf8f2; --ink: #2f3a2c; --muted: #8a8b7c;
+  --accent: #1f2f4d; --accent-ink: #fbf8f2; --accent2: #b8955a;
+  --card: #fffdf9; --card-border: #e6dfcf; --card-shadow: 0 24px 50px -36px rgba(47, 58, 44, .55);
+  --title-color: #55663f; --name-color: #1f2f4d; --cd-bg: #f4f0e6; --cd-color: #1f2f4d; --ico-bg: #f1efe4;
+  --field-bg: #f8f5ee; --line: #c9b78f;
+  --cover-bg: #fbf8f2;
+  --btn-shadow: 0 14px 26px -16px rgba(31, 47, 77, .9);
+  --radius: 4px; --photo-radius: 4px; --g-aspect: 4 / 3.4;
+  --font-body: 'EB Garamond', Georgia, serif;
+  --font-title: 'Allura', cursive;
+  --font-name: 'Allura', cursive;
+  --font-quote: 'EB Garamond', Georgia, serif;
+  background: #fbf8f2; font-size: 19px;
+}
+.theme-boda #ambient { background: linear-gradient(180deg, #fbf8f2, #f6f1e6 60%, #fbf8f2); }
+
+/* ===== Portada con foto a pantalla completa ===== */
+.theme-boda .hero { padding: 0; width: 100vw; margin-left: calc(50% - 50vw); min-height: 100vh; min-height: 100svh; overflow: hidden; }
+.bd-hero { position: relative; width: 100%; min-height: 100vh; min-height: 100svh; display: flex; align-items: flex-end; justify-content: center; text-align: center; color: #2f3a2c; }
+.bd-hero.has-photo { color: #fffaf0; }
+.bd-photo { position: absolute; inset: -4%; background-size: cover; background-position: 48% 22%; animation: bdKen 22s ease-in-out infinite alternate; }
+@keyframes bdKen { from { transform: scale(1.02) } to { transform: scale(1.12) translateY(-2%) } }
+.bd-shade { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(20, 24, 18, .05) 0%, rgba(20, 24, 18, .1) 40%, rgba(20, 24, 18, .72) 82%, rgba(20, 24, 18, .82) 100%); }
+.bd-hero-in { position: relative; z-index: 1; width: min(560px, 100%); padding: 0 22px 96px; }
+.bd-kicker { margin: 0; font: 400 .95rem/1 'Italiana', serif; letter-spacing: .45em; text-transform: uppercase; }
+.bd-names { margin: .1em 0 .05em; font: 400 clamp(3.6rem, 17vw, 6rem)/1.05 'Allura', cursive; text-shadow: 0 2px 20px rgba(0, 0, 0, .25); }
+.bd-date { display: flex; align-items: center; justify-content: center; gap: 14px; margin: 6px 0 0; font-family: 'Italiana', serif; text-transform: uppercase; letter-spacing: .22em; font-size: .9rem; }
+.bd-date b { font: 400 2.6rem/1 'Italiana', serif; letter-spacing: 0; padding: 0 14px; border-left: 1px solid currentColor; border-right: 1px solid currentColor; }
+.bd-lead { max-width: 32ch; margin: 18px auto 0; font-style: italic; font-size: 1.15rem; line-height: 1.5; opacity: .95; }
+.bd-scroll { position: absolute; z-index: 1; left: 50%; bottom: 18px; transform: translateX(-50%); font: .7rem 'Italiana', serif; letter-spacing: .3em; text-transform: uppercase; opacity: .8; display: grid; justify-items: center; gap: 6px; }
+.has-photo .bd-scroll { color: #fffaf0; }
+.bd-scroll span { width: 1px; height: 26px; background: currentColor; animation: bdLine 1.8s ease-in-out infinite; transform-origin: top; }
+@keyframes bdLine { 0% { transform: scaleY(0) } 50% { transform: scaleY(1) } 100% { transform: scaleY(1); opacity: 0 } }
+.theme-boda.bd-open .bd-kicker, .theme-boda.bd-open .bd-names, .theme-boda.bd-open .bd-date, .theme-boda.bd-open .bd-lead { animation: bdUp 1.4s cubic-bezier(.2, .8, .2, 1) both; }
+.theme-boda.bd-open .bd-names { animation-delay: .2s; } .theme-boda.bd-open .bd-date { animation-delay: .45s; } .theme-boda.bd-open .bd-lead { animation-delay: .65s; }
+@keyframes bdUp { from { opacity: 0; transform: translateY(24px); filter: blur(4px) } to { opacity: 1; transform: none; filter: none } }
+.theme-boda .scroll-hint { display: none; }
+
+/* ===== Secciones ===== */
+.theme-boda .sec-title { font-weight: 400; font-size: 2.9rem; line-height: 1.1; color: #55663f; }
+.theme-boda .sec-title::after { content: ''; display: block; width: 46px; height: 1px; margin: 12px auto 0; background: #b8955a; }
+.theme-boda .card { border-radius: 4px; -webkit-backdrop-filter: none; backdrop-filter: none; }
+.theme-boda .card::before { content: ''; position: absolute; inset: 6px; border: 1px solid #efe8d8; pointer-events: none; }
+.theme-boda .btn { font-family: 'Italiana', serif; letter-spacing: .14em; text-transform: uppercase; font-size: .82rem; border-radius: 2px; font-weight: 400; }
+.theme-boda .btn.big { font-size: .9rem; }
+.theme-boda .cd-box { border-radius: 2px; background: transparent; border: 1px solid #e6dfcf; }
+.theme-boda .cd-num { font-family: 'Italiana', serif; font-weight: 400; font-size: clamp(2.1rem, 9vw, 2.8rem); }
+.theme-boda .cd-lbl, .theme-boda .rsvp-for, .theme-boda .fam h3, .theme-boda .cover-kicker, .theme-boda .t-time { font-family: 'Italiana', serif; letter-spacing: .2em; text-transform: uppercase; }
+.theme-boda .fam h3 { color: #b8955a; font-size: .85rem; }
+.theme-boda .fam p { font-size: 1.3rem; }
+.theme-boda .place-t { font: 400 2.2rem 'Allura', cursive; color: #55663f; }
+.theme-boda .place-h { color: #1f2f4d !important; }
+.theme-boda .note h3 { font: 400 2.2rem 'Allura', cursive; color: #55663f; }
+.theme-boda .t-dot { background: #fbf8f2; border: 1.5px solid #7d8f6e; box-shadow: 0 0 0 4px #fffdf9; }
+.theme-boda .timeline::before { border-left: 1px solid #d8d0bd; }
+.theme-boda .rsvp-name { font-size: 3rem; }
+.theme-boda .quote p { color: #55663f; font-size: 1.3rem; }
+.theme-boda .quote .bd-sprig, .theme-boda .story .bd-sprig, .theme-boda .foot .bd-sprig { display: block; margin: 0 auto 14px; }
+.theme-boda .firma { font-size: 2.8rem; color: #1f2f4d; }
+.theme-boda .cover-name { color: #1f2f4d; font-size: clamp(2.6rem, 11vw, 3.4rem); }
+.theme-boda .cover-art { width: min(220px, 56vw); animation: floatIn 1.2s ease both; }
+.theme-boda .g-open { border: 6px solid #fff; box-shadow: 0 18px 30px -22px rgba(0, 0, 0, .5); }
+.bd-credit { margin: 10px 0 0; font-size: .75rem; color: var(--muted); }
+
+/* Historia (fotos tipo álbum) */
+.theme-boda .st-item:nth-child(odd) .st-photo { transform: rotate(-1.6deg); }
+.theme-boda .st-item:nth-child(even) .st-photo { transform: rotate(1.4deg); }
+.theme-boda .st-photo { border: 7px solid #fff; border-bottom-width: 26px; box-shadow: 0 20px 34px -24px rgba(0, 0, 0, .55); }
+.theme-boda .st-date { font-family: 'Italiana', serif; letter-spacing: .25em; color: #b8955a; }
+.theme-boda .st-item h3 { font: 400 2.2rem 'Allura', cursive; color: #1f2f4d; }
+
+/* Fondo: luces cálidas como guirnalda */
+.theme-boda .leak { position: absolute; border-radius: 50%; filter: blur(70px); opacity: .45; }
+.theme-boda .leak.l1 { width: 50vmax; height: 50vmax; right: -25vmax; top: 30%; background: #f1e2c1; }
+.theme-boda .leak.l2 { width: 45vmax; height: 45vmax; left: -22vmax; bottom: -10vmax; background: #e3e8d6; }
+.theme-boda .bokeh { position: absolute; border-radius: 50%; background: radial-gradient(circle, rgba(255, 236, 190, .9), rgba(232, 199, 128, .25) 60%, transparent 72%); animation: bdFloat linear infinite; }
+@keyframes bdFloat { 0%, 100% { transform: translate(0, 0); opacity: .2 } 25% { opacity: .7 } 50% { transform: translate(18px, -30px); opacity: .4 } 75% { opacity: .75 } }
+
+@media (min-width: 900px) {
+  .bd-photo { background-position: 50% 35%; }
+  .bd-hero-in { padding-bottom: 110px; }
+}
+@media (max-height: 720px), (max-width: 340px) {
+  .bd-hero-in { padding-bottom: 62px; }
+  .bd-kicker { font-size: .78rem; }
+  .bd-names { font-size: clamp(2.6rem, 13vw, 3.4rem); }
+  .bd-date { font-size: .72rem; gap: 10px; }
+  .bd-date b { font-size: 2rem; padding: 0 10px; }
+  .bd-lead { font-size: .95rem; margin-top: 10px; }
+  .bd-photo { background-position: 48% 12%; }
+  .bd-scroll { display: none; }
+}
+
+/* ===== Sobre con sello de cera ===== */
+.theme-boda .cover { background: radial-gradient(ellipse at 50% 35%, #fffdf8 0%, #efe9dc 80%); }
+.theme-boda .cover-art { width: min(330px, 84vw); margin-bottom: 26px; animation: floatIn 1.2s ease both; }
+.bd-env { position: relative; width: 100%; aspect-ratio: 16 / 11; perspective: 900px; cursor: pointer; }
+.bd-env-back { position: absolute; inset: 0; border-radius: 6px; background: #e4dccb; box-shadow: 0 30px 50px -30px rgba(47, 58, 44, .7); }
+.bd-env-card { position: absolute; left: 7%; right: 7%; top: 8%; bottom: 8%; z-index: 1; background: #fffdf8; border-radius: 3px; display: grid; place-content: center; gap: 2px; text-align: center; color: #1f2f4d; box-shadow: 0 2px 8px rgba(0,0,0,.08); transition: transform 1s cubic-bezier(.2,.8,.2,1) .55s; }
+.bd-env-card .c-k { font: .62rem 'Italiana', serif; letter-spacing: .4em; text-transform: uppercase; color: #7d8f6e; }
+.bd-env-card .c-n { font: 400 2.1rem/1.1 'Allura', cursive; }
+.bd-env-card .c-d { font: .66rem 'Italiana', serif; letter-spacing: .25em; text-transform: uppercase; color: #8a8b7c; }
+.bd-env-front { position: absolute; inset: 0; z-index: 2; border-radius: 6px; overflow: hidden; background: linear-gradient(160deg, #fbf8f2, #efe9dc); clip-path: polygon(0 0, 50% 52%, 100% 0, 100% 100%, 0 100%); }
+.bd-env-sprig { position: absolute; left: 50%; bottom: 10%; width: 62%; transform: translateX(-50%); }
+.bd-env-flap { position: absolute; left: 0; right: 0; top: 0; height: 58%; z-index: 3; transform-origin: top; transition: transform .8s cubic-bezier(.5,0,.3,1) .2s; }
+.bd-env-flap .flap-in { position: absolute; inset: 0; background: linear-gradient(180deg, #f6f1e6, #e9e1cf); clip-path: polygon(0 0, 100% 0, 50% 100%); }
+.bd-seal { position: absolute; left: 50%; top: 58%; z-index: 4; width: 74px; height: 74px; margin: -37px 0 0 -37px; border: 0; padding: 0; cursor: pointer;
+  border-radius: 48% 52% 50% 50% / 52% 48% 52% 48%; background: radial-gradient(circle at 35% 30%, #e2c88f, #b8955a 55%, #8f6f38);
+  box-shadow: inset 0 0 0 6px rgba(255,255,255,.14), inset 0 -4px 10px rgba(0,0,0,.25), 0 8px 16px -6px rgba(80, 60, 20, .6); transition: transform .5s ease, opacity .4s ease; animation: bdSeal 2.6s ease-in-out infinite; }
+.bd-seal span { display: block; font: 400 2rem/74px 'Allura', cursive; color: #fff8e6; text-shadow: 0 -1px 0 rgba(0,0,0,.3); letter-spacing: -.02em; }
+@keyframes bdSeal { 0%, 100% { transform: scale(1) } 50% { transform: scale(1.06) } }
+.theme-boda .cover.opening { transform: none; opacity: 0; transition: opacity .7s ease 1.5s; }
+.theme-boda .cover.opening .bd-seal { animation: none; transform: scale(1.4) rotate(-12deg); opacity: 0; }
+.theme-boda .cover.opening .bd-env-flap { transform: rotateX(180deg); z-index: 0; }
+.theme-boda .cover.opening .bd-env-card { transform: translateY(-62%); z-index: 2; }
+.theme-boda .cover.opening .cover-kicker, .theme-boda .cover.opening .cover-name, .theme-boda .cover.opening .cover-btn, .theme-boda .cover.opening .cover-music { opacity: 0; transition: opacity .3s; }
+
+/* Premium en este tema */
+.theme-boda .sep-text p { font-family: 'Allura', cursive; font-size: clamp(2.6rem, 10vw, 3.6rem); }
+.theme-boda .pass-top { background: linear-gradient(120deg, #1f2f4d, #33476b); }
+.theme-boda .pass-event { font-family: 'Allura', cursive; font-size: 2rem; }
+.theme-boda .hashtag { font-family: 'Italiana', serif; letter-spacing: .08em; border-radius: 2px; }
+.theme-boda .faq-item, .theme-boda .gift-row { border-radius: 4px; }
+.theme-boda .faq-item summary { font-weight: 500; }
+.theme-boda .env-title { font-family: 'Italiana', serif; letter-spacing: .14em; text-transform: uppercase; font-weight: 400; font-size: .9rem; }

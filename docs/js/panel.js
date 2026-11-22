@@ -446,6 +446,7 @@
       <label>Padres y padrinos (una línea por grupo: <code>Título: nombre, nombre</code>)<textarea name="padres" rows="3" placeholder="Mis padres: Mónica Ramírez, Javier Castillo">${esc((c.padres || []).map(p => (p.titulo || '') + ': ' + (p.nombres || []).join(', ')).join('\n'))}</textarea></label>
       <fieldset><legend>Fotos y música</legend>
         <label>Foto principal<input name="fotoPortada" value="${esc(c.fotoPortada)}" placeholder="fotos/portada.jpg o enlace de Google Drive"></label>
+        <label>Foto principal para celular (opcional, vertical)<input name="fotoPortadaMovil" value="${esc(c.fotoPortadaMovil)}" placeholder="fotos/portada-movil.jpg"></label>
         <label>Galería (un enlace por línea)<textarea name="galeria" rows="4" placeholder="fotos/1.jpg">${esc((c.galeria || []).join('\n'))}</textarea></label>
         <label>Música<input name="musica" value="${esc(c.musica)}" placeholder="musica/cancion.mp3 · enlace .mp3 · cajita"></label>
         <label>Crédito de la música (si la licencia lo pide)<input name="musicaCredito" value="${esc(c.musicaCredito)}" placeholder="Canción — Autor (sitio), licencia"></label>
@@ -511,6 +512,7 @@
         cita: f.cita.value.trim(),
         padres: f.padres.value.split('\n').map(x => x.trim()).filter(Boolean).map(x => { const i = x.indexOf(':'); return { titulo: i >= 0 ? x.slice(0, i).trim() : '', nombres: (i >= 0 ? x.slice(i + 1) : x).split(',').map(n => n.trim()).filter(Boolean) }; }),
         fotoPortada: f.fotoPortada.value.trim(),
+        fotoPortadaMovil: f.fotoPortadaMovil.value.trim(),
         galeria: f.galeria.value.split('\n').map(x => x.trim()).filter(Boolean),
         musica: f.musica.value.trim(),
         musicaCredito: f.musicaCredito.value.trim(),

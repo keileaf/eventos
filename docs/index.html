@@ -4,74 +4,273 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Invitaciones digitales</title>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;700&family=Great+Vibes&family=Baloo+2:wght@800&family=Bangers&family=Pacifico&family=Great+Vibes&family=Cormorant+Garamond:wght@600&family=Pinyon+Script&family=Allura&display=swap">
+  <meta name="description" content="Invitaciones digitales para bodas, XV años y fiestas, con confirmación de asistencia, música, fotos y pase con QR.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
   <style>
-    body { margin: 0; font: 16px/1.55 'Quicksand', system-ui, sans-serif; color: #4a443b; background: #ffffff; }
-    .wrap { max-width: 900px; margin: 0 auto; padding: 48px 20px 60px; text-align: center; }
-    h1 { font-family: 'Great Vibes', cursive; font-weight: 400; font-size: clamp(3rem, 10vw, 4.6rem); color: #5e97ab; margin: 0; line-height: 1.1; }
-    .sub { color: #9a907f; max-width: 52ch; margin: 8px auto 34px; }
-    .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; text-align: left; }
-    .demo { display: block; border-radius: 22px; padding: 24px 22px 60px; text-decoration: none; color: inherit; min-height: 210px; position: relative; overflow: hidden; transition: transform .2s, box-shadow .2s; }
-    .demo:hover { transform: translateY(-4px); box-shadow: 0 20px 40px -24px rgba(0,0,0,.45); }
-    .demo small { text-transform: uppercase; letter-spacing: .16em; font-size: .72rem; opacity: .8; }
-    .demo .n { display: block; margin: 6px 0 6px; font-size: 2.3rem; line-height: 1.05; }
-    .demo p { margin: 0; opacity: .85; font-size: .92rem; max-width: 22ch; }
-    .demo .go { position: absolute; left: 22px; bottom: 18px; font-weight: 700; font-size: .9rem; }
-    .demo .em { position: absolute; right: 14px; bottom: 10px; font-size: 48px; opacity: .9; }
-    .space { background: linear-gradient(160deg, #7b48e0, #3d1d8a); color: #fff; }
-    .space .n { font-family: 'Bangers', sans-serif; letter-spacing: 1px; color: #ffd23f; text-shadow: 3px 3px 0 #1b1340; }
-    .garden { background: linear-gradient(160deg, #fff4f1, #f3e6fb); color: #5b4152; border: 2px solid #f6d6e2; }
-    .garden .n { font-family: 'Pacifico', cursive; color: #d4648f; font-weight: 400; }
-    .xv { background: linear-gradient(160deg, #fffaf7, #f6e1dc); color: #4b3a36; border: 1px solid #ead8c6; }
-    .xv .n { font-family: 'Great Vibes', cursive; font-weight: 400; color: #b98a3c; font-size: 3rem; }
-    .bodac { background: linear-gradient(160deg, #fbf8f2, #e9e6d8); color: #2f3a2c; border: 1px solid #e6dfcf; }
-    .bodac .n { font-family: 'Allura', cursive; font-weight: 400; color: #1f2f4d; font-size: 2.6rem; }
-    .panel { background: #ffffff; border: 1px solid #e7dcc8; }
-    .panel .n { font-family: 'Great Vibes', cursive; color: #5e97ab; font-weight: 400; }
-    .demo-link { margin: 22px 0 0; font-size: .95rem; color: #9a907f; }
-    .demo-link a { color: #5e97ab; font-weight: 700; }
-    .azul { background: linear-gradient(160deg, #ffffff, #e3ecf7); color: #3f5f8f; border: 1px solid #d6e2f0; }
-    .azul .n { font-family: 'Pinyon Script', cursive; font-weight: 400; color: #5b7fb5; font-size: 2.9rem; }
-    .how { margin-top: 44px; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; text-align: left; }
-    .how div { background: #ffffff; border: 1px solid #e7dcc8; border-radius: 16px; padding: 16px; font-size: .9rem; }
-    .how b { display: block; color: #5e97ab; margin-bottom: 4px; }
+    :root { --ink: #23262f; --muted: #6b7080; --line: #e8e9ef; --brand: #4f7fbf; --brand-d: #3b679f; --soft: #f5f7fb; --wa: #25d366; --wa-d: #1da851; }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; font: 16px/1.6 'Plus Jakarta Sans', system-ui, sans-serif; color: var(--ink); background: #fff; }
+    a { color: inherit; }
+    .wrap { max-width: 1080px; margin: 0 auto; padding: 0 20px; }
+    .ico { width: 1.2em; height: 1.2em; flex: none; }
+
+    /* Barra superior */
+    .nav { position: sticky; top: 0; z-index: 10; background: rgba(255,255,255,.92); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); }
+    .nav .wrap { display: flex; align-items: center; justify-content: space-between; gap: 12px; height: 64px; }
+    .logo { font-weight: 800; font-size: 1.15rem; letter-spacing: -.01em; text-decoration: none; display: flex; align-items: center; gap: 8px; }
+    .logo i { width: 30px; height: 30px; border-radius: 9px; background: linear-gradient(135deg, #4f7fbf, #8b6fd6); display: grid; place-items: center; color: #fff; font-style: normal; font-size: .95rem; }
+    .nav-links { display: flex; align-items: center; gap: 6px; }
+    .nav-links a.txt { padding: 8px 12px; text-decoration: none; color: var(--muted); font-weight: 600; font-size: .92rem; border-radius: 10px; }
+    .nav-links a.txt:hover { color: var(--ink); background: var(--soft); }
+
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 20px; border-radius: 12px; font: 700 .95rem 'Plus Jakarta Sans', sans-serif; text-decoration: none; border: 1.5px solid transparent; cursor: pointer; transition: transform .15s, background .2s, box-shadow .2s; white-space: nowrap; }
+    .btn:hover { transform: translateY(-1px); }
+    .btn.primary { background: var(--brand); color: #fff; box-shadow: 0 10px 22px -12px var(--brand); }
+    .btn.primary:hover { background: var(--brand-d); }
+    .btn.line { border-color: var(--line); background: #fff; color: var(--ink); }
+    .btn.line:hover { border-color: #cfd3de; }
+    .btn.wa { background: var(--wa); color: #fff; box-shadow: 0 10px 22px -12px var(--wa); }
+    .btn.wa:hover { background: var(--wa-d); }
+    .btn.sm { padding: 8px 14px; font-size: .88rem; border-radius: 10px; }
+
+    /* Hero */
+    .hero { padding: 64px 0 40px; text-align: center; }
+    .pill { display: inline-block; padding: 6px 14px; border-radius: 999px; background: var(--soft); color: var(--brand-d); font-weight: 700; font-size: .82rem; }
+    h1 { margin: 16px auto 12px; max-width: 18ch; font-size: clamp(2.1rem, 6vw, 3.4rem); line-height: 1.1; letter-spacing: -.025em; font-weight: 800; }
+    h1 span { background: linear-gradient(90deg, #4f7fbf, #8b6fd6 60%, #d0748f); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .lead { max-width: 56ch; margin: 0 auto; color: var(--muted); font-size: 1.08rem; }
+    .hero-cta { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 26px; }
+
+    section { padding: 56px 0; }
+    .sec-head { text-align: center; margin-bottom: 30px; }
+    h2 { margin: 0 0 8px; font-size: clamp(1.6rem, 4vw, 2.2rem); letter-spacing: -.02em; font-weight: 800; }
+    .sec-head p { margin: 0 auto; max-width: 56ch; color: var(--muted); }
+
+    /* Demos */
+    .demos { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; }
+    .demo { position: relative; display: flex; flex-direction: column; min-height: 200px; padding: 22px 20px 54px; border-radius: 20px; text-decoration: none; overflow: hidden; transition: transform .2s, box-shadow .2s; }
+    .demo:hover { transform: translateY(-4px); box-shadow: 0 20px 40px -26px rgba(0,0,0,.45); }
+    .demo small { font-weight: 700; font-size: .72rem; text-transform: uppercase; letter-spacing: .12em; opacity: .8; }
+    .demo b { display: block; margin: 6px 0 6px; font-size: 1.3rem; line-height: 1.15; letter-spacing: -.01em; }
+    .demo p { margin: 0; font-size: .9rem; opacity: .88; max-width: 24ch; }
+    .demo .go { position: absolute; left: 20px; bottom: 18px; font-weight: 700; font-size: .88rem; }
+    .demo .em { position: absolute; right: 16px; bottom: 12px; font-size: 40px; }
+    .d1 { background: linear-gradient(150deg, #7b48e0, #3d1d8a); color: #fff; }
+    .d1 b { color: #ffd23f; }
+    .d2 { background: linear-gradient(150deg, #fff4f1, #f1e6fb); color: #5b4152; }
+    .d2 b { color: #d4648f; }
+    .d3 { background: linear-gradient(150deg, #fffaf7, #f4ddd7); color: #4b3a36; }
+    .d3 b { color: #a8605a; }
+    .d4 { background: linear-gradient(150deg, #ffffff, #e2ebf7); color: #3f5476; border: 1px solid #dfe7f3; }
+    .d4 b { color: #4f7fbf; }
+    .d5 { background: linear-gradient(150deg, #fbf8f2, #e6e3d3); color: #2f3a2c; }
+    .d5 b { color: #1f2f4d; }
+
+    /* Qué incluye */
+    .feats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .feat { padding: 20px; border: 1px solid var(--line); border-radius: 16px; background: #fff; }
+    .feat .fi { width: 42px; height: 42px; border-radius: 12px; display: grid; place-items: center; background: var(--soft); color: var(--brand); margin-bottom: 10px; }
+    .feat h3 { margin: 0 0 4px; font-size: 1.02rem; }
+    .feat p { margin: 0; color: var(--muted); font-size: .92rem; }
+
+    /* Precios */
+    .bg-soft { background: var(--soft); }
+    .plans { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; align-items: stretch; }
+    .plan { display: flex; flex-direction: column; padding: 26px 22px; border-radius: 20px; background: #fff; border: 1px solid var(--line); position: relative; }
+    .plan.hl { border: 2px solid var(--brand); box-shadow: 0 24px 46px -30px rgba(79,127,191,.7); }
+    .tag { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: var(--brand); color: #fff; font-size: .72rem; font-weight: 700; padding: 4px 12px; border-radius: 999px; letter-spacing: .04em; }
+    .plan h3 { margin: 0; font-size: 1.15rem; }
+    .plan .for { margin: 2px 0 14px; color: var(--muted); font-size: .9rem; }
+    .price { font-size: 2.6rem; font-weight: 800; letter-spacing: -.03em; line-height: 1; }
+    .price small { font-size: .9rem; font-weight: 600; color: var(--muted); letter-spacing: 0; }
+    .once { margin: 6px 0 16px; font-size: .82rem; font-weight: 700; color: #2f8a57; }
+    .plan ul { list-style: none; margin: 0 0 20px; padding: 0; display: grid; gap: 8px; font-size: .92rem; }
+    .plan li { display: flex; gap: 8px; align-items: flex-start; }
+    .plan li::before { content: ''; flex: none; width: 18px; height: 18px; margin-top: 2px; border-radius: 50%; background: #e3f4ea url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 12.5l4 4 8-9' fill='none' stroke='%232f8a57' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/12px no-repeat; }
+    .plan .btn { margin-top: auto; }
+    .note { margin: 18px auto 0; max-width: 64ch; text-align: center; color: var(--muted); font-size: .88rem; }
+
+    /* Acceso */
+    .access { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .acc { padding: 24px; border-radius: 20px; border: 1px solid var(--line); }
+    .acc h3 { margin: 0 0 6px; font-size: 1.1rem; }
+    .acc p { margin: 0 0 16px; color: var(--muted); font-size: .94rem; }
+    .acc .row { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    /* Contacto */
+    .contact { text-align: center; padding: 40px 24px; border-radius: 24px; background: linear-gradient(135deg, #eef8f1, #f4f1fb); }
+    .contact h2 { margin-bottom: 6px; }
+    .contact p { margin: 0 auto 20px; max-width: 48ch; color: var(--muted); }
+    .phone { display: block; margin-top: 12px; font-weight: 700; color: var(--ink); text-decoration: none; }
+    .socials { display: flex; gap: 10px; justify-content: center; margin-top: 18px; }
+    .soc { width: 46px; height: 46px; border-radius: 14px; display: grid; place-items: center; background: #fff; border: 1px solid var(--line); color: var(--ink); transition: transform .15s; }
+    .soc:hover { transform: translateY(-2px); }
+    .soc .ico { width: 22px; height: 22px; }
+
+    footer { padding: 26px 0 40px; text-align: center; color: var(--muted); font-size: .85rem; }
+
+    .wa-float { position: fixed; right: 18px; bottom: 18px; z-index: 20; width: 56px; height: 56px; border-radius: 50%; display: grid; place-items: center; background: var(--wa); color: #fff; box-shadow: 0 12px 24px -10px rgba(0,0,0,.4); }
+    .wa-float .ico { width: 28px; height: 28px; }
+
+    @media (max-width: 980px) { .demos { grid-template-columns: repeat(3, 1fr); } }
+    @media (max-width: 820px) { .feats { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 640px) { .demos { grid-template-columns: repeat(2, 1fr); } .demos .demo:last-child { grid-column: 1 / -1; } }
+    @media (max-width: 520px) { .feats, .demos { grid-template-columns: 1fr; } .demo .em { font-size: 34px; } }
+    @media (max-width: 720px) {
+      .nav-links a.txt { display: none; }
+      .access { grid-template-columns: 1fr; }
+      .hero { padding-top: 44px; }
+    }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <h1>Invitaciones</h1>
-    <p class="sub">Invitaciones digitales con confirmación de asistencia. Cada evento tiene su propio diseño y su propia hoja de invitados.</p>
-    <div class="cards">
-      <a class="demo space" id="dMateo"><small>Demo · cumpleaños niño</small><span class="n">Mateo · 6</span><p>Estilo cómic: el festejado es el héroe, con sus fotos y credencial QR.</p><span class="go">Ver invitación →</span><span class="em">⚡</span></a>
-      <a class="demo garden" id="dVale"><small>Demo · cumpleaños niña</small><span class="n">Valentina · 4</span><p>Jardín de mariposas con flores y pétalos animados.</p><span class="go">Ver invitación →</span><span class="em">🦋</span></a>
-      <a class="demo xv" id="dSofia"><small>Demo · XV años</small><span class="n">Sofía Valeria</span><p>Rosa y oro, con fotos, música, padrinos, misa y recepción con croquis.</p><span class="go">Ver invitación →</span><span class="em">👑</span></a>
-      <a class="demo azul" id="dCamila"><small>Demo · XV años</small><span class="n">Camila Renata</span><p>Sobre con sello de cera, fotos, pase con QR y lluvia de sobres.</p><span class="go">Ver invitación →</span><span class="em">💙</span></a>
-      <a class="demo bodac" id="dBoda"><small>Demo · boda</small><span class="n">Andrea & Rodrigo</span><p>Jardín al atardecer: fotos a pantalla completa, nuestra historia y música.</p><span class="go">Ver invitación →</span><span class="em">💍</span></a>
-      <a class="demo panel" href="panel.html"><small>Para ti y tus clientes</small><span class="n">Panel</span><p>Crea eventos, invitados y mira quién confirmó.</p><span class="go">Entrar →</span><span class="em">📋</span></a>
+  <header class="nav">
+    <div class="wrap">
+      <a class="logo" href="#"><i>✉</i> Invitaciones</a>
+      <nav class="nav-links">
+        <a class="txt" href="#demos">Ejemplos</a>
+        <a class="txt" href="#incluye">Qué incluye</a>
+        <a class="txt" href="#precios">Precios</a>
+        <a class="txt" href="#contacto">Contacto</a>
+        <a class="btn primary sm" id="navPanel" href="panel.html">Entrar al panel</a>
+      </nav>
     </div>
-    <p class="demo-link" id="demoLink"></p>
-    <div class="how">
-      <div><b>1 · Super usuario</b>Creas el evento, eliges el diseño y das de alta al cliente.</div>
-      <div><b>2 · Festejador</b>Entra al panel, agrega invitados y los envía por WhatsApp.</div>
-      <div><b>3 · Invitado</b>Abre su enlace personal y confirma cuántos asistirán.</div>
-    </div>
-  </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="wrap">
+        <span class="pill">Bodas · XV años · Fiestas · Posadas · Bautizos · Festejos y más</span>
+        <h1>Invitaciones digitales que <span>tus invitados no olvidan</span></h1>
+        <p class="lead">Diseño a la medida con fotos, música y confirmación de asistencia. Cada invitado recibe su enlace personal por WhatsApp, y tú ves en tiempo real quién confirma.</p>
+        <div class="hero-cta">
+          <a class="btn wa" data-wa="Hola, me interesa una invitación digital 💌"><svg class="ico" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.4.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.8 11.9 11.9 0 0 0 4.6 4c1.7.7 2.4.8 3.2.7a2.8 2.8 0 0 0 1.8-1.3 2.3 2.3 0 0 0 .2-1.3c-.1-.1-.2-.2-.5-.3z"/></svg> Cotizar por WhatsApp</a>
+        </div>
+      </div>
+    </section>
+
+    <section id="demos" style="padding-top:20px">
+      <div class="wrap">
+        <div class="sec-head"><h2>Ejemplos para explorar</h2><p>Abre cualquiera como si fueras invitado: puedes confirmar, ver el pase con QR y escuchar la música.</p></div>
+        <div class="demos">
+          <a class="demo d1" data-demo="mateo-6|Tz4hQ8nLs3Ve"><small>Cumpleaños infantil</small><b>Mateo · 6 años</b><p>Estilo cómic: el festejado es el héroe, con sus fotos y credencial QR.</p><span class="go">Ver invitación →</span><span class="em">⚡</span></a>
+          <a class="demo d2" data-demo="valentina-4|Jm4pXc7wRd2N"><small>Cumpleaños infantil</small><b>Valentina · 4 años</b><p>Jardín de mariposas con flores y pétalos animados.</p><span class="go">Ver invitación →</span><span class="em">🦋</span></a>
+          <a class="demo d4" data-demo="camila-xv|Az4mQr8tLp2W"><small>XV años</small><b>Camila Renata</b><p>Sobre con sello de cera, sesión de fotos, pase con QR y lluvia de sobres.</p><span class="go">Ver invitación →</span><span class="em">💙</span></a>
+          <a class="demo d3" data-demo="sofia-xv|Xv3dLw9sTe4K"><small>XV años</small><b>Sofía Valeria</b><p>Rosa y oro, con padrinos, misa y recepción con croquis.</p><span class="go">Ver invitación →</span><span class="em">👑</span></a>
+          <a class="demo d5" data-demo="andrea-rodrigo|Bd5kRt8mWq3Z"><small>Boda</small><b>Andrea & Rodrigo</b><p>Fotos a pantalla completa, nuestra historia, hospedaje y preguntas frecuentes.</p><span class="go">Ver invitación →</span><span class="em">💍</span></a>
+        </div>
+      </div>
+    </section>
+
+    <section id="incluye" class="bg-soft">
+      <div class="wrap">
+        <div class="sec-head"><h2>Qué incluye tu invitación</h2><p>Todo lo que tus invitados necesitan saber, en un solo enlace que se abre desde el celular.</p></div>
+        <div class="feats">
+          <div class="feat"><div class="fi">🎨</div><h3>Diseño a la medida</h3><p>Colores, tipografías y animaciones según la temática de tu evento.</p></div>
+          <div class="feat"><div class="fi">✅</div><h3>Confirmación de asistencia</h3><p>Cada invitado tiene su enlace único, con sus lugares reservados y una sola respuesta.</p></div>
+          <div class="feat"><div class="fi">📊</div><h3>Panel para el organizador</h3><p>Agrega invitados, envíalos por WhatsApp y ve en tiempo real quién confirmó.</p></div>
+          <div class="feat"><div class="fi">📷</div><h3>Fotos y galería</h3><p>Tus fotos en portada, galería deslizable y fotos a lo ancho entre secciones.</p></div>
+          <div class="feat"><div class="fi">🎵</div><h3>Música</h3><p>Una canción de fondo que empieza al abrir la invitación.</p></div>
+          <div class="feat"><div class="fi">📍</div><h3>Ubicación y mapa</h3><p>Ceremonia y recepción con botón de "Cómo llegar", mapa y croquis.</p></div>
+          <div class="feat"><div class="fi">⏳</div><h3>Cuenta regresiva e itinerario</h3><p>Los días que faltan y el programa del evento paso a paso.</p></div>
+          <div class="feat"><div class="fi">🎟️</div><h3>Pase con código QR</h3><p>Al confirmar, el invitado recibe su pase con nombre, personas y mesa.</p></div>
+          <div class="feat"><div class="fi">🎁</div><h3>Regalos y lluvia de sobres</h3><p>Mesa de regalos y datos bancarios con botón para copiar la CLABE.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="precios">
+      <div class="wrap">
+        <div class="sec-head"><h2>Precios</h2><p>Un solo pago por evento. Sin mensualidades y sin cobro por invitado.</p></div>
+        <div class="plans">
+          <div class="plan">
+            <h3>Fiesta</h3><p class="for">Cumpleaños, bautizos, baby showers</p>
+            <div class="price"><span data-price="fiesta">$250</span> <small>MXN</small></div><p class="once">Pago único</p>
+            <ul><li>Diseño temático animado</li><li>Confirmación de asistencia</li><li>Panel con lista de invitados</li><li>Ubicación, mapa e itinerario</li><li>Fotos y música</li></ul>
+            <a class="btn line" data-wa="Hola, me interesa una invitación digital para fiesta ($250) 🎉">Lo quiero</a>
+          </div>
+          <div class="plan hl">
+            <span class="tag">Más pedido</span>
+            <h3>XV años</h3><p class="for">Quince años con todos los detalles</p>
+            <div class="price"><span data-price="xv">$400</span> <small>MXN</small></div><p class="once">Pago único</p>
+            <ul><li>Todo lo del paquete Fiesta</li><li>Sobre animado con sello de cera</li><li>Galería y fotos a lo ancho</li><li>Padres, padrinos y corte de honor</li><li>Pase con código QR</li><li>Mesa de regalos y lluvia de sobres</li></ul>
+            <a class="btn primary" data-wa="Hola, me interesa una invitación digital de XV años ($400) 👑">Lo quiero</a>
+          </div>
+          <div class="plan">
+            <h3>Boda</h3><p class="for">La experiencia completa</p>
+            <div class="price"><span data-price="boda">$500</span> <small>MXN</small></div><p class="once">Pago único</p>
+            <ul><li>Todo lo del paquete XV años</li><li>Sección "Nuestra historia"</li><li>Hospedaje y preguntas frecuentes</li><li>Alergias y canción favorita al confirmar</li><li>Mesa asignada en el pase</li><li>Ceremonia, recepción y tornaboda</li></ul>
+            <a class="btn line" data-wa="Hola, me interesa una invitación digital de boda ($500) 💍">Lo quiero</a>
+          </div>
+        </div>
+        <p class="note">Los precios son en pesos mexicanos e incluyen el diseño y la publicación de la invitación. Escríbenos para revisar tu idea y los detalles de tu evento.</p>
+      </div>
+    </section>
+
+    <section class="bg-soft" id="acceso">
+      <div class="wrap">
+        <div class="sec-head"><h2>Acceso al panel</h2><p>Entra con tu usuario y contraseña. Cada cuenta ve solo lo que le corresponde según su nivel.</p></div>
+        <div class="access">
+          <div class="acc"><h3>Organizadores</h3><p>Si ya contrataste tu invitación, entra para agregar invitados, enviarlos por WhatsApp y ver quién confirmó.</p><div class="row"><a class="btn primary" id="accPanel" href="panel.html">Entrar al panel</a></div></div>
+          <div class="acc"><h3>¿Quieres probarlo?</h3><p>Explora un panel de ejemplo con datos ficticios. Usuario <b>novios.ar</b> y contraseña <b>boda123</b>.</p><div class="row"><a class="btn line" href="panel.html?demo=1">Probar panel de ejemplo</a></div></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="contacto">
+      <div class="wrap">
+        <div class="contact">
+          <h2>¿Hacemos la tuya?</h2>
+          <p>Cuéntanos de tu evento y te ayudamos a diseñar una invitación única.</p>
+          <a class="btn wa" data-wa="Hola, quiero información sobre las invitaciones digitales 💌"><svg class="ico" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.4.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.8 11.9 11.9 0 0 0 4.6 4c1.7.7 2.4.8 3.2.7a2.8 2.8 0 0 0 1.8-1.3 2.3 2.3 0 0 0 .2-1.3c-.1-.1-.2-.2-.5-.3z"/></svg> Escríbenos por WhatsApp</a>
+          <a class="phone" id="phone"></a>
+          <div class="socials" id="socials"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer><div class="wrap">© <span id="yr"></span> Invitaciones digitales · Hecho con cariño en Tijuana</div></footer>
+  <a class="wa-float" data-wa="Hola, me interesa una invitación digital 💌" aria-label="WhatsApp"><svg class="ico" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.4.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.8 11.9 11.9 0 0 0 4.6 4c1.7.7 2.4.8 3.2.7a2.8 2.8 0 0 0 1.8-1.3 2.3 2.3 0 0 0 .2-1.3c-.1-.1-.2-.2-.5-.3z"/></svg></a>
+
   <script src="js/config.js"></script>
-  <script src="js/common.js"></script>
-  <script src="js/api.js"></script>
   <script>
-    // Las tarjetas demo solo funcionan en modo demo (sin API_URL). Con tu servidor real se ocultan;
-    // si luego quieres mostrar ejemplos reales, cambia estos IDs/tokens por los de tus propios eventos.
-    if (!API.isDemo) ['dMateo', 'dVale', 'dSofia', 'dCamila', 'dBoda'].forEach(id => document.getElementById(id).style.display = 'none');
-    else document.querySelector('.panel').href = API.link('panel.html');
-    document.getElementById('demoLink').innerHTML = API.isDemo
-      ? (API.forcedDemo ? 'Estás viendo los ejemplos · <a href="./">Salir del demo</a>' : '')
-      : '<a href="?demo=1">Ver invitaciones de ejemplo →</a>';
-    document.getElementById('dMateo').href = U.inviteUrl('mateo-6', 'Tz4hQ8nLs3Ve');
-    document.getElementById('dVale').href = U.inviteUrl('valentina-4', 'Jm4pXc7wRd2N');
-    document.getElementById('dSofia').href = U.inviteUrl('sofia-xv', 'Xv3dLw9sTe4K');
-    document.getElementById('dCamila').href = U.inviteUrl('camila-xv', 'Az4mQr8tLp2W');
-    document.getElementById('dBoda').href = U.inviteUrl('andrea-rodrigo', 'Bd5kRt8mWq3Z');
+    (function () {
+      const C = window.APP_CONFIG || {}, K = C.CONTACTO || {}, P = C.PRECIOS || {};
+      const digits = String(K.whatsapp || '').replace(/\D/g, '');
+      // WhatsApp
+      document.querySelectorAll('[data-wa]').forEach(a => {
+        a.href = 'https://wa.me/' + digits + '?text=' + encodeURIComponent(a.dataset.wa);
+        a.target = '_blank'; a.rel = 'noopener';
+      });
+      const ph = document.getElementById('phone');
+      if (K.whatsapp) { ph.textContent = K.whatsapp; ph.href = 'https://wa.me/' + digits; ph.target = '_blank'; } else ph.remove();
+      // Precios
+      document.querySelectorAll('[data-price]').forEach(el => { const v = P[el.dataset.price]; if (v != null) el.textContent = '$' + v; });
+      // Redes
+      const icons = {
+        instagram: '<rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor"/>',
+        tiktok: '<path d="M14 3h3a4.5 4.5 0 0 0 4 4v3a7.5 7.5 0 0 1-4-1.2V15a6 6 0 1 1-6-6v3.2A2.8 2.8 0 1 0 14 15z" fill="currentColor"/>',
+        facebook: '<path d="M14 8h3V4.5h-3A4 4 0 0 0 10 8.5V11H7.5v3.5H10V21h3.5v-6.5h3L17 11h-3.5V9a1 1 0 0 1 1-1z" fill="currentColor"/>',
+      };
+      const box = document.getElementById('socials');
+      ['instagram', 'tiktok', 'facebook'].forEach(n => {
+        if (!K[n]) return;
+        box.insertAdjacentHTML('beforeend', `<a class="soc" href="${K[n]}" target="_blank" rel="noopener" aria-label="${n}"><svg class="ico" viewBox="0 0 24 24">${icons[n]}</svg></a>`);
+      });
+      if (!box.children.length) box.remove();
+      // Demos: siempre en modo de ejemplo (no tocan la hoja de cálculo real)
+      document.querySelectorAll('[data-demo]').forEach(a => {
+        const [e, i] = a.dataset.demo.split('|');
+        a.href = 'invitacion.html?demo=1&e=' + encodeURIComponent(e) + '&i=' + encodeURIComponent(i);
+      });
+      // Si la portada se abre con ?demo=1, el botón del panel lleva al panel de ejemplo
+      if (new URLSearchParams(location.search).get('demo') === '1') ['navPanel', 'accPanel'].forEach(id => { document.getElementById(id).href = 'panel.html?demo=1'; });
+      document.getElementById('yr').textContent = new Date().getFullYear();
+    })();
   </script>
 </body>
 </html>

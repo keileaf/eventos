@@ -39,7 +39,7 @@
       const foto = U.img(cfg.fotoPortada);
       const dia = d ? d.toLocaleDateString('es-MX', { weekday: 'long' }) : '';
       return `<div class="bd-hero ${foto ? 'has-photo' : ''}">
-        ${foto ? `<div class="bd-photo" style="background-image:url('${esc(foto)}')"></div><div class="bd-shade"></div>` : ''}
+        ${foto ? `<div class="bd-photo ${U.img(cfg.fotoPortadaMovil) ? 'has-m' : ''}" style="background-image:url('${esc(foto)}')"></div>${U.img(cfg.fotoPortadaMovil) ? `<div class="bd-photo bd-photo-m" style="background-image:url('${esc(U.img(cfg.fotoPortadaMovil))}')"></div>` : ''}<div class="bd-shade"></div>` : ''}
         <div class="bd-hero-in">
           <p class="bd-kicker">${esc(cfg.encabezado || 'Nos casamos')}</p>
           <h1 class="bd-names">${esc(cfg.festejado || '')}</h1>

@@ -12,5 +12,14 @@ window.APP_CONFIG = {
     'xv-azul': { nombre: 'XV años · Azul acuarela', para: 'Quince años' },
     boda: { nombre: 'Boda · Jardín al atardecer', para: 'Boda' },
   },
+  // Contacto y redes de la portada. Deja vacía una red para ocultar su botón.
+  CONTACTO: {
+    whatsapp: '+52 664 218 1185',
+    instagram: '',   // ej. 'https://instagram.com/tu_usuario'
+    tiktok: '',      // ej. 'https://tiktok.com/@tu_usuario'
+    facebook: '',    // ej. 'https://facebook.com/tu_pagina'
+  },
+  // Precios de diseño (pago único, MXN)
+  PRECIOS: { fiesta: 250, xv: 400, boda: 500 },
   TIPOS: { cumpleanos: 'Cumpleaños', xv: 'XV años', boda: 'Boda', bautizo: 'Bautizo', otro: 'Otro' },
 };

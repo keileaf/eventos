@@ -7,8 +7,8 @@ body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.5 'Quic
 #view { max-width: 1100px; margin: 0 auto; padding: 22px 18px 60px; }
 code { background: #f1e9db; padding: 1px 5px; border-radius: 5px; font-size: .85em; }
 h1, h2, h3 { margin: 0; }
-.brand { font-family: 'Great Vibes', cursive; font-weight: 400; color: var(--teal); font-size: 3rem; line-height: 1.1; }
-.brand.sm { font-size: 2.2rem; border-left: 1.5px solid var(--teal); padding-left: 12px; }
+.brand { font-family: 'Plus Jakarta Sans', 'Quicksand', sans-serif; font-weight: 800; letter-spacing: -.02em; color: var(--teal); font-size: 2.2rem; line-height: 1.1; }
+.brand.sm { font-size: 1.4rem; border-left: 1.5px solid var(--teal); padding-left: 12px; }
 
 #demoBar { background: #fff3d6; border-bottom: 1px solid #ecd9a8; padding: 8px 16px; font-size: .85rem; text-align: center; }
 #demoBar code { background: #fbe7b5; }

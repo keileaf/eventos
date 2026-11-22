@@ -43,7 +43,7 @@
   };
 
   /* ================= BACKEND DEMO (imita a Code.gs) ================= */
-  const DEMO_KEY = 'inv_demo_v8';
+  const DEMO_KEY = 'inv_demo_v10';
   const Demo = {
     db: null,
     load() {
@@ -322,6 +322,7 @@
             ],
             vestimenta: 'Formal. Te pedimos reservar el color rosa palo para la quinceañera.',
             regalos: 'Mesa de regalos en Liverpool #51234567 o lluvia de sobres.',
+            pase: true,
             firma: 'Con cariño, Sofía Valeria',
             fechaLimite: '2027-06-01',
             whatsapp: '¡Hola {nombre}! ✨ Con mucha ilusión te invito a mis XV años. Aquí está tu invitación: {enlace}',
@@ -381,6 +382,7 @@
             cita: 'Elegirte fue fácil; lo difícil fue esperar este día.',
             fecha: '2027-10-16T17:00', duracionHoras: 8,
             fotoPortada: 'fotos/boda-portada.jpg',
+            fotoPortadaMovil: 'fotos/boda-portada-movil.jpg',
             historia: [
               { fecha: '2019', titulo: 'Nos conocimos', texto: 'Una reunión de amigos, una plática que no queríamos terminar y muchas risas desde el primer día.', foto: 'fotos/boda-historia-1.jpg' },
               { fecha: '2021', titulo: 'Caminando juntos', texto: 'Viajes, mudanzas y domingos sin prisa. Aprendimos que con el otro todo es mejor.', foto: 'fotos/boda-historia-2.jpg' },

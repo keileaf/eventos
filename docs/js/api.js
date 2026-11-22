@@ -43,7 +43,7 @@
   };
 
   /* ================= BACKEND DEMO (imita a Code.gs) ================= */
-  const DEMO_KEY = 'inv_demo_v10';
+  const DEMO_KEY = 'inv_demo_v11';
   const Demo = {
     db: null,
     load() {
@@ -249,7 +249,7 @@
               { foto: 'fotos/mateo-sep-2.jpg', texto: '¡Misión: diversión!', pos: '50% 40%' },
             ],
             musica: 'musica/fiesta.mp3',
-            musicaCredito: 'Monkeys Spinning Monkeys — Kevin MacLeod (incompetech.com), CC BY 3.0',
+            musicaCredito: 'Monkeys Spinning Monkeys — Kevin MacLeod (incompetech.com), CC BY 4.0',
             lugares: [
               { titulo: 'Base secreta', hora: '3:00 p. m.', nombre: 'Salón de Fiestas Galaxia', direccion: 'Av. Revolución 1234, Zona Centro, Tijuana, B.C.', mapa: 'https://maps.google.com/?q=Av.+Revolucion+1234+Tijuana', croquis: '' },
             ],
@@ -274,24 +274,38 @@
           },
         },
         {
-          id: 'valentina-4', propietario: 'familia.vale', tema: 'jardin', activo: true, creado: d(18), actualizado: d(3),
+          id: 'valentina-4', propietario: 'familia.vale', tema: 'cuento', activo: true, creado: d(18), actualizado: d(1),
           config: {
             tipo: 'cumpleanos', festejado: 'Valentina', edad: 4,
-            encabezado: 'Un día mágico en el jardín',
-            frase: 'Las mariposas ya están listas para celebrar los 4 años de Valentina. ¡Ven a revolotear con nosotros!',
+            encabezado: 'Érase una vez…',
+            frase: 'En un reino de nieve y estrellas, una pequeña princesa cumple 4 años. Y su cuento no estaría completo sin ti.',
             fecha: '2027-04-24T16:00', duracionHoras: 4,
-            lugar: { nombre: 'Jardín de Eventos Las Flores', direccion: 'Blvd. Agua Caliente 4558, Tijuana, B.C.', mapa: 'https://maps.google.com/?q=Blvd+Agua+Caliente+4558+Tijuana' },
-            horario: [
-              { hora: '4:00 p. m.', texto: 'Bienvenida en el jardín' },
-              { hora: '5:00 p. m.', texto: 'Taller de alas de mariposa' },
-              { hora: '6:00 p. m.', texto: 'Pastel y mañanitas' },
-              { hora: '8:00 p. m.', texto: 'Despedida' },
+            fotoPortada: 'fotos/vale-portada.jpg',
+            galeria: ['fotos/vale-galeria-1.jpg', 'fotos/vale-galeria-2.jpg', 'fotos/vale-galeria-3.jpg'],
+            separadores: [
+              { foto: 'fotos/vale-sep-1.jpg', texto: 'Cada cuento empieza con una página', pos: '62% 40%' },
+              { foto: 'fotos/vale-sep-2.jpg', texto: '¡Y el tuyo también está aquí!', pos: '50% 40%' },
             ],
-            vestimenta: 'Colores pastel. ¡Las alas y coronas de flores son bienvenidas!',
-            regalos: 'Lluvia de sobres.',
-            firma: 'Con amor, Andrea y Luis',
+            musica: 'musica/cuento.mp3',
+            musicaCredito: 'Frost Waltz — Kevin MacLeod (incompetech.com), CC BY 4.0',
+            lugares: [
+              { titulo: 'El castillo', hora: '4:00 p. m.', nombre: 'Jardín de Eventos Las Flores', direccion: 'Blvd. Agua Caliente 4558, Tijuana, B.C.', mapa: 'https://maps.google.com/?q=Blvd+Agua+Caliente+4558+Tijuana', croquis: '' },
+            ],
+            horario: [
+              { hora: '4:00 p. m.', texto: 'Llegada al reino' },
+              { hora: '4:30 p. m.', texto: 'Hora del cuento y juegos de nieve' },
+              { hora: '5:30 p. m.', texto: 'Taller de coronas y varitas' },
+              { hora: '6:30 p. m.', texto: 'Pastel y mañanitas' },
+              { hora: '7:30 p. m.', texto: 'Despedida con bolsitas sorpresa' },
+            ],
+            vestimenta: 'Ven vestida o vestido de tu personaje de cuento favorito. ¡Las coronas y las capas son bienvenidas!',
+            paleta: ['#cfe0f5', '#b7a4e0', '#ffffff', '#9fb6dc', '#e6e0f7'],
+            regalos: 'Tu presencia es el mejor regalo. Si deseas tener un detalle, a Valentina le encantan los libros de cuentos.',
+            rsvpPreguntas: { alergias: true, cancion: false },
+            pase: true,
+            firma: 'Con cariño, Andrea y Luis',
             fechaLimite: '2027-04-10',
-            whatsapp: '¡Hola {nombre}! 🦋 {festejado} cumple {edad} y nos encantaría verte en su fiesta. Tu invitación: {enlace}',
+            whatsapp: '¡Hola {nombre}! ❄️ Valentina cumple {edad} y su cuento no estaría completo sin ti. Aquí está tu invitación: {enlace}',
           },
         },
         {

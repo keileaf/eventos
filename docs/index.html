@@ -58,6 +58,10 @@
     .demo p { margin: 0; font-size: .9rem; opacity: .88; max-width: 24ch; }
     .demo .go { position: absolute; left: 20px; bottom: 18px; font-weight: 700; font-size: .88rem; }
     .demo .em { position: absolute; right: 16px; bottom: 12px; font-size: 40px; }
+    .demo.sk { background: linear-gradient(100deg, #f1f3f8 30%, #f8f9fc 50%, #f1f3f8 70%); background-size: 300% 100%; animation: sk 1.2s linear infinite; pointer-events: none; }
+    @keyframes sk { from { background-position: 100% 0 } to { background-position: 0 0 } }
+    .demos .demo { animation: fadeIn .35s ease both; }
+    @keyframes fadeIn { from { opacity: 0 } }
     .d1 { background: linear-gradient(150deg, #7b48e0, #3d1d8a); color: #fff; }
     .d1 b { color: #ffd23f; }
     .d2 { background: linear-gradient(150deg, #f4f7ff, #ddd5f5); color: #2f3a63; }
@@ -268,8 +272,21 @@
         box.style.setProperty('--n', Math.max(1, Math.min(5, list.length)));
         document.getElementById('demos').hidden = !list.length;
       };
-      paint([]);
-      API.call('getSite').then(site => paint((site || {}).demosOcultas || [])).catch(() => {});
+      // Sin parpadeo: usa la última selección conocida (si existe) y, si no, tarjetas "cargando"
+      const KEY = 'inv_demos_ocultas';
+      let cached = null;
+      try { cached = JSON.parse(localStorage.getItem(KEY)); } catch (e) {}
+      const box0 = document.getElementById('demos-list');
+      if (Array.isArray(cached)) paint(cached);
+      else { box0.style.setProperty('--n', 3); box0.innerHTML = '<div class="demo sk"></div>'.repeat(3); }
+      let done = false;
+      const finish = (ocultas) => {
+        if (done) return; done = true;
+        if (JSON.stringify(ocultas) !== JSON.stringify(cached)) paint(ocultas);
+        try { localStorage.setItem(KEY, JSON.stringify(ocultas)); } catch (e) {}
+      };
+      API.call('getSite').then(site => finish((site || {}).demosOcultas || [])).catch(() => finish(cached || []));
+      setTimeout(() => finish(cached || []), 6000); // si el servidor no responde, muestra lo último conocido
       document.getElementById('yr').textContent = new Date().getFullYear();
     })();
   </script>

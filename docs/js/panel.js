@@ -27,7 +27,7 @@
 
   if (API.isDemo) {
     const bar = $('#demoBar'); bar.hidden = false;
-    bar.innerHTML = `<strong>Modo demo</strong> · los datos se guardan solo en este navegador. Super usuario: <code>admin / admin123</code> · Clientes: <code>familia.mateo / mateo123</code>, <code>familia.vale / vale123</code>, <code>familia.sofia / sofia123</code> <button id="resetDemo" class="link">Reiniciar demo</button>${API.forcedDemo ? ' · <a class="link" href="panel.html">Salir del demo</a>' : ''}`;
+    bar.innerHTML = `<strong>Panel de ejemplo</strong> · datos ficticios que solo existen en este navegador; no afectan ningún evento real. <button id="resetDemo" class="link">Reiniciar ejemplo</button>${API.forcedDemo ? ' · <a class="link" href="panel.html">Ir al panel real</a>' : ''}`;
     $('#resetDemo').onclick = () => { API.resetDemo(); API.setSession(null); location.hash = ''; route(); U.toast('Demo reiniciada', 'ok'); };
   }
 

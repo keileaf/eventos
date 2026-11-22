@@ -270,8 +270,6 @@
       };
       paint([]);
       API.call('getSite').then(site => paint((site || {}).demosOcultas || [])).catch(() => {});
-      // Si la portada se abre con ?demo=1, el botón del panel lleva al panel de ejemplo
-      if (new URLSearchParams(location.search).get('demo') === '1') ['navPanel', 'accPanel'].forEach(id => { document.getElementById(id).href = 'panel.html?demo=1'; });
       document.getElementById('yr').textContent = new Date().getFullYear();
     })();
   </script>

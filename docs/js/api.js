@@ -43,7 +43,7 @@
   };
 
   /* ================= BACKEND DEMO (imita a Code.gs) ================= */
-  const DEMO_KEY = 'inv_demo_v11';
+  const DEMO_KEY = 'inv_demo_v12';
   const Demo = {
     db: null,
     load() {
@@ -233,7 +233,7 @@
       ({ token, nombre, personas, lugares, telefono, estado, confirmados, detalle, mensaje, respondido: resp, enviado: env, creado: d(12) });
     return {
       users: [
-        { usuario: 'admin', password: 'admin123', rol: 'admin', nombre: 'Super usuario', creado: d(30) },
+        { usuario: 'admin', password: 'Ejemplo-Kei-2026', rol: 'admin', nombre: 'Super usuario', creado: d(30) },
         { usuario: 'familia.mateo', password: 'mateo123', rol: 'cliente', nombre: 'Daniel y Sofía', creado: d(20) },
         { usuario: 'familia.vale', password: 'vale123', rol: 'cliente', nombre: 'Andrea y Luis', creado: d(18) },
         { usuario: 'familia.sofia', password: 'sofia123', rol: 'cliente', nombre: 'Mónica y Javier', creado: d(25) },

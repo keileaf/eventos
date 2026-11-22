@@ -84,7 +84,9 @@
           <h2 class="sec">Eventos (${S.events.length})</h2>
           <div class="ev-list">${S.events.length ? S.events.map(evCard).join('') : '<p class="empty">Aún no hay eventos.</p>'}</div>
         </section>
-        ${admin ? `<section><h2 class="sec">Nuevo evento</h2>${newEventForm()}</section>` : ''}
+        ${admin ? `<section><h2 class="sec">Nuevo evento</h2>${newEventForm()}
+          <h2 class="sec">Demos en la página principal</h2>
+          <div class="card" id="demosBox"><p class="meta">Cargando…</p></div></section>` : ''}
       </div>`;
     bindTop();
     $$('[data-archive]').forEach(b => b.onclick = () => confirmBtn(b, async () => {
@@ -93,7 +95,7 @@
     $$('[data-restore]').forEach(b => b.onclick = async () => {
       try { await API.call('updateEvent', { e: b.dataset.restore, activo: true }); route(); } catch (e) { handleErr(e); }
     });
-    if (admin) bindNewEvent();
+    if (admin) { bindNewEvent(); renderDemoToggles(); }
   }
 
   function evCard(ev) {
@@ -115,6 +117,21 @@
         ${S.me.rol === 'admin' ? (ev.activo ? `<button class="btn sm danger" data-archive="${esc(ev.id)}">Archivar</button>` : `<button class="btn sm" data-restore="${esc(ev.id)}">Reactivar</button>`) : ''}
       </div>
     </article>`;
+  }
+
+  async function renderDemoToggles() {
+    const box = $('#demosBox'); if (!box) return;
+    let ocultas = [];
+    try { ocultas = ((await API.call('getSite')) || {}).demosOcultas || []; } catch (e) {}
+    box.innerHTML = `<p class="hint">Activa las demos que quieres mostrar en la portada. Se guarda al instante.</p>
+      ${(CFG.DEMOS || []).map(d => `<label class="tg-row"><span><b>${esc(d.titulo)}</b><br><span class="meta">${esc(d.tipo)}</span></span>
+        <span class="tg"><input type="checkbox" data-demo="${esc(d.id)}" ${ocultas.includes(d.id) ? '' : 'checked'}><i></i></span></label>`).join('')}
+      <a class="btn sm" href="index.html" target="_blank">Ver página principal</a>`;
+    $$('[data-demo]', box).forEach(cb => cb.onchange = async () => {
+      const hidden = $$('[data-demo]', box).filter(x => !x.checked).map(x => x.dataset.demo);
+      try { await API.call('saveSite', { demosOcultas: hidden }); U.toast(cb.checked ? 'Demo visible en la portada' : 'Demo oculta de la portada', 'ok'); }
+      catch (err) { cb.checked = !cb.checked; handleErr(err); }
+    });
   }
 
   function newEventForm() {

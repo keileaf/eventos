@@ -202,6 +202,12 @@
         this.auth(req, true); const ev = this.db.events.find(e => e.id === req.e);
         if (!ev) throw new Error('Evento no encontrado'); ev.activo = false; return true;
       },
+      getSite() { return this.db.site || {}; },
+      saveSite(req) {
+        this.auth(req, true); this.db.site = this.db.site || {};
+        if (Array.isArray(req.demosOcultas)) this.db.site.demosOcultas = req.demosOcultas.map(String);
+        return this.db.site;
+      },
       listUsers(req) { this.auth(req, true); return this.db.users.map(u => ({ usuario: u.usuario, rol: u.rol, nombre: u.nombre, creado: u.creado })); },
       createUser(req) { this.auth(req, true); const u = this.createUser(req, req.rol === 'admin' ? 'admin' : 'cliente'); return { usuario: u.usuario, rol: u.rol, nombre: u.nombre }; },
       resetPassword(req) {

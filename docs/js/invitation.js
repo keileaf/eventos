@@ -274,7 +274,7 @@
           <p><span>Invitado</span><strong>${esc(inv.nombre)}</strong></p>
           <p><span>Personas</span><strong>${inv.confirmados}</strong></p>
           ${d ? `<p><span>Fecha</span><strong>${esc(d.toLocaleDateString('es-MX', { day: 'numeric', month: 'short', year: 'numeric' }))}</strong></p>` : ''}
-          ${inv.mesa ? `<p><span>Mesa</span><strong>${esc(inv.mesa)}</strong></p>` : ''}
+          ${inv.mesa ? `<p><span>Mesa</span><strong>${esc(String(inv.mesa).replace(/^mesa\s+/i, ''))}</strong></p>` : ''}
         </div>
       </div>
       <p class="pass-foot">Presenta este pase en la entrada · toma captura de pantalla</p>

@@ -268,7 +268,7 @@
   // ---------- Panel de un evento ----------
   async function openEvent(id) {
     const [ev, guests] = await Promise.all([API.call('getEvent', { e: id }), API.call('listGuests', { e: id })]);
-    S.ev = ev; S.guests = guests;
+    S.ev = ev; S.guests = guests; S.seat = null;
     renderEvent();
   }
 
@@ -313,9 +313,11 @@
           <div class="chips" id="chips">${['todos', 'pendiente', 'confirmó', 'declinó', 'sin enviar'].map(k => `<button class="chip ${S.filter === k ? 'on' : ''}" data-f="${k}">${k}</button>`).join('')}</div>
           <div id="guests"></div>
         </div>
-      </div>`;
+      </div>
+      <section class="seat-wrap" id="seatSec"></section>`;
     bindTop();
     renderStats(); renderGuests();
+    loadSeating();
 
     $('#search').oninput = (e) => { S.q = e.target.value; renderGuests(); };
     $$('#chips .chip').forEach(b => b.onclick = () => { S.filter = b.dataset.f; $$('#chips .chip').forEach(x => x.classList.toggle('on', x === b)); renderGuests(); });
@@ -335,6 +337,201 @@
       catch (err) { handleErr(err); }
     };
     bindEventForm();
+  }
+
+  // ================= MESAS Y ACOMODO =================
+  const uid = () => Math.random().toString(36).slice(2, 9);
+  let seatTimer = null;
+
+  async function loadSeating() {
+    const box = $('#seatSec'); if (!box) return;
+    box.innerHTML = `<h2 class="sec">Mesas y acomodo</h2><div class="card"><p class="meta">Cargando…</p></div>`;
+    try { S.seat = await API.call('getSeating', { e: S.ev.id }); } catch (e) { S.seat = { activo: false, mesas: [] }; }
+    renderSeating();
+  }
+
+  // Personas que se pueden sentar (las que declinaron no aparecen)
+  function seatPeople() {
+    const out = [];
+    S.guests.forEach(g => {
+      if (g.estado === 'declinó') return;
+      const pers = String(g.personas || '').split(',').map(x => x.trim()).filter(Boolean);
+      const det = String(g.detalle || '').split(',').map(x => x.trim()).filter(Boolean);
+      let names;
+      if (pers.length) names = g.estado === 'confirmó' && det.length ? det : pers;
+      else {
+        const n = g.estado === 'confirmó' ? (+g.confirmados || 0) : (+g.lugares || 1);
+        names = n <= 1 ? [g.nombre] : Array.from({ length: n }, (_, k) => `${g.nombre} (${k + 1})`);
+      }
+      names.forEach(p => out.push({ token: g.token, persona: p, guest: g.nombre, estado: g.estado || 'pendiente' }));
+    });
+    return out;
+  }
+  const seatKey = (t, p) => t + '|' + p;
+
+  function seatStats() {
+    const P = S.seat.mesas;
+    const sillas = P.reduce((a, m) => a + m.sillas.length, 0);
+    const ocupadas = P.reduce((a, m) => a + m.sillas.filter(c => c.persona).length, 0);
+    const seated = new Set(); P.forEach(m => m.sillas.forEach(c => c.token && seated.add(seatKey(c.token, c.persona))));
+    const sinLugar = seatPeople().filter(p => !seated.has(seatKey(p.token, p.persona)));
+    return { mesas: P.length, sillas, ocupadas, libres: sillas - ocupadas, sinLugar };
+  }
+
+  function renderSeating() {
+    const box = $('#seatSec'); if (!box) return;
+    const on = S.seat.activo;
+    const head = `<div class="sec-row"><h2 class="sec">Mesas y acomodo</h2>
+      <label class="tg-row inline-tg"><span>${on ? 'Activado' : 'Desactivado'}</span><span class="tg"><input type="checkbox" id="seatOn" ${on ? 'checked' : ''}><i></i></span></label></div>`;
+    if (!on) {
+      box.innerHTML = head + `<div class="card seat-off"><p><b>Organiza a tus invitados por mesa.</b> Crea mesas con las sillas que necesites, ponle nombre o número a cada silla y asigna a cada persona. La mesa aparece en el pase de cada invitado.</p>
+        <p class="meta">Actívalo con el interruptor. Puedes apagarlo cuando quieras; tu acomodo se conserva.</p></div>`;
+      $('#seatOn').onchange = (e) => { S.seat.activo = e.target.checked; renderSeating(); saveSeating(true); };
+      return;
+    }
+    const st = seatStats();
+    box.innerHTML = head + `
+      <div class="card seat-tools">
+        <form class="seat-gen" id="seatGen">
+          <span>Crear</span><input name="n" type="number" min="1" max="100" value="5" aria-label="Número de mesas">
+          <span>mesas de</span><input name="s" type="number" min="1" max="40" value="8" aria-label="Sillas por mesa"><span>sillas</span>
+          <button class="btn sm primary">Crear mesas</button>
+        </form>
+        <form class="seat-gen" id="seatAdd">
+          <span>Agregar</span><input name="nombre" placeholder="Mesa de honor" class="w-name" aria-label="Nombre de la mesa">
+          <span>con</span><input name="s" type="number" min="1" max="40" value="10" aria-label="Sillas"><span>sillas</span>
+          <button class="btn sm">Agregar mesa</button>
+        </form>
+        <div class="seat-stats">
+          <span><b>${st.mesas}</b> mesas</span><span><b>${st.sillas}</b> sillas</span><span class="ok"><b>${st.ocupadas}</b> ocupadas</span><span><b>${st.libres}</b> libres</span>
+          <span class="${st.sinLugar.length ? 'warn' : 'ok'}"><b>${st.sinLugar.length}</b> personas sin lugar</span>
+          <span class="meta" id="seatStatus"></span>
+        </div>
+        ${st.sinLugar.length ? `<details class="nolugar"><summary>Ver personas sin lugar</summary><p>${st.sinLugar.map(p => `<span class="pchip ${p.estado === 'confirmó' ? 'c' : ''}">${esc(p.persona)}</span>`).join('')}</p><p class="hint">En verde, las que ya confirmaron. Toca una silla para asignar.</p></details>` : ''}
+      </div>
+      <div class="tables">${S.seat.mesas.map(tableHtml).join('') || '<p class="empty">Aún no hay mesas. Créalas arriba.</p>'}</div>`;
+
+    $('#seatOn').onchange = (e) => { S.seat.activo = e.target.checked; renderSeating(); saveSeating(true); };
+    $('#seatGen').onsubmit = (e) => {
+      e.preventDefault(); const n = Math.min(100, +e.target.n.value || 0), s = Math.min(40, +e.target.s.value || 0);
+      if (!n || !s) return;
+      const start = nextTableNum();
+      for (let k = 0; k < n; k++) S.seat.mesas.push({ id: uid(), nombre: 'Mesa ' + (start + k), sillas: Array.from({ length: s }, () => ({ id: uid(), nombre: '', token: '', persona: '' })) });
+      renderSeating(); saveSeating(); U.toast(`${n} ${n === 1 ? 'mesa creada' : 'mesas creadas'}`, 'ok');
+    };
+    $('#seatAdd').onsubmit = (e) => {
+      e.preventDefault(); const s = Math.min(40, +e.target.s.value || 0); if (!s) return;
+      S.seat.mesas.push({ id: uid(), nombre: e.target.nombre.value.trim() || 'Mesa ' + nextTableNum(), sillas: Array.from({ length: s }, () => ({ id: uid(), nombre: '', token: '', persona: '' })) });
+      renderSeating(); saveSeating(); U.toast('Mesa agregada', 'ok');
+    };
+    $$('.tbl').forEach(bindTable);
+  }
+
+  // Siguiente número libre: después de la "Mesa N" más alta
+  function nextTableNum() {
+    return S.seat.mesas.reduce((mx, m) => { const r = /^Mesa (\d+)$/i.exec(m.nombre || ''); return r ? Math.max(mx, +r[1]) : mx; }, 0) + 1;
+  }
+
+  function tableHtml(m) {
+    const n = m.sillas.length, used = m.sillas.filter(c => c.persona).length;
+    const R = 84, size = Math.max(18, Math.min(30, (2 * Math.PI * R) / Math.max(n, 1) - 4));
+    const seats = m.sillas.map((c, k) => {
+      const a = (k / n) * 2 * Math.PI - Math.PI / 2, x = 105 + R * Math.cos(a), y = 105 + R * Math.sin(a);
+      return `<button class="seat ${c.persona ? 'on' : ''}" data-s="${esc(c.id)}" style="left:${(x - size / 2).toFixed(1)}px;top:${(y - size / 2).toFixed(1)}px;width:${size.toFixed(0)}px;height:${size.toFixed(0)}px" title="${esc((c.nombre || 'Silla ' + (k + 1)) + (c.persona ? ' · ' + c.persona : ' · libre'))}">${esc(c.nombre ? c.nombre.slice(0, 2) : k + 1)}</button>`;
+    }).join('');
+    return `<article class="card tbl" data-m="${esc(m.id)}">
+      <div class="tbl-head"><button class="tbl-name" data-a="rename" title="Cambiar nombre">${esc(m.nombre)} ✎</button><span class="badge ${used === n && n ? 'green' : 'gray'}">${used}/${n}</span></div>
+      <div class="tbl-vis"><div class="tbl-top"><span>${esc(m.nombre)}</span></div>${seats}</div>
+      <ol class="tbl-list">${m.sillas.map((c, k) => `<li><button data-s="${esc(c.id)}"><span class="sn">${esc(c.nombre || k + 1)}</span>${c.persona ? `<span>${esc(c.persona)}</span>` : '<span class="free">libre</span>'}</button></li>`).join('')}</ol>
+      <div class="actions">
+        <button class="btn sm" data-a="add">+ Silla</button>
+        <button class="btn sm" data-a="rm" ${n ? '' : 'disabled'}>− Silla</button>
+        <button class="btn sm" data-a="clear">Vaciar</button>
+        <button class="btn sm danger" data-a="del">Eliminar mesa</button>
+      </div>
+    </article>`;
+  }
+
+  function bindTable(card) {
+    const m = S.seat.mesas.find(x => x.id === card.dataset.m); if (!m) return;
+    $$('[data-s]', card).forEach(b => b.onclick = () => seatDialog(m, m.sillas.find(c => c.id === b.dataset.s)));
+    $('[data-a=rename]', card).onclick = () => promptBox('Nombre de la mesa', m.nombre, (v) => { if (v) { m.nombre = v.slice(0, 40); renderSeating(); saveSeating(); } });
+    $('[data-a=add]', card).onclick = () => { if (m.sillas.length >= 40) return U.toast('Máximo 40 sillas por mesa', 'warn'); m.sillas.push({ id: uid(), nombre: '', token: '', persona: '' }); renderSeating(); saveSeating(); };
+    $('[data-a=rm]', card).onclick = () => {
+      // quita la última silla libre; si todas están ocupadas, pregunta por la última
+      let k = -1; for (let i = m.sillas.length - 1; i >= 0; i--) if (!m.sillas[i].persona) { k = i; break; }
+      if (k < 0) return U.toast('Todas las sillas están ocupadas. Toca una silla para eliminarla.', 'warn');
+      m.sillas.splice(k, 1); renderSeating(); saveSeating();
+    };
+    $('[data-a=clear]', card).onclick = (e) => confirmBtn(e.currentTarget, () => { m.sillas.forEach(c => { c.token = ''; c.persona = ''; }); renderSeating(); saveSeating(); });
+    $('[data-a=del]', card).onclick = (e) => confirmBtn(e.currentTarget, () => { S.seat.mesas = S.seat.mesas.filter(x => x !== m); renderSeating(); saveSeating(); U.toast('Mesa eliminada', 'ok'); });
+  }
+
+  function seatDialog(m, c) {
+    const k = m.sillas.indexOf(c);
+    const seated = {}; S.seat.mesas.forEach(mm => mm.sillas.forEach(cc => { if (cc.token) seated[seatKey(cc.token, cc.persona)] = mm.nombre; }));
+    const people = seatPeople();
+    const free = people.filter(p => !seated[seatKey(p.token, p.persona)]);
+    const taken = people.filter(p => seated[seatKey(p.token, p.persona)] && !(p.token === c.token && p.persona === c.persona));
+    const opt = (p, extra) => `<option value="${esc(p.token + '|' + p.persona)}">${esc(p.persona)}${p.persona !== p.guest ? ' — ' + esc(p.guest) : ''}${p.estado === 'confirmó' ? ' ✓' : ''}${extra || ''}</option>`;
+    const cur = c.persona ? (c.token ? c.token + '|' + c.persona : '__free') : '';
+    const dlg = document.createElement('div'); dlg.className = 'modal';
+    dlg.innerHTML = `<form class="card modal-card form">
+      <h3>${esc(m.nombre)} · ${esc(c.nombre || 'Silla ' + (k + 1))}</h3>
+      <label>Nombre o número de la silla<input name="sn" value="${esc(c.nombre)}" placeholder="${k + 1}" maxlength="30"></label>
+      <label>¿Quién se sienta aquí?<select name="who">
+        <option value="">— Silla libre —</option>
+        ${c.persona ? `<option value="${esc(cur)}" selected>${esc(c.persona)} (actual)</option>` : ''}
+        ${free.length ? `<optgroup label="Sin lugar">${free.map(p => opt(p)).join('')}</optgroup>` : ''}
+        ${taken.length ? `<optgroup label="Ya sentados (se cambian a esta silla)">${taken.map(p => opt(p, ' · ' + esc(seated[seatKey(p.token, p.persona)]))).join('')}</optgroup>` : ''}
+        <option value="__free">Otra persona (escribir nombre)…</option>
+      </select></label>
+      <label class="free-name" ${cur === '__free' ? '' : 'hidden'}>Nombre<input name="fname" value="${esc(c.token ? '' : c.persona)}" maxlength="80" placeholder="Ej. Novia, Fotógrafo…"></label>
+      <div class="actions"><button class="btn primary">Guardar</button><button type="button" class="btn" data-x="cancel">Cancelar</button><button type="button" class="btn danger" data-x="del">Eliminar silla</button></div>
+    </form>`;
+    document.body.appendChild(dlg);
+    const f = $('form', dlg), close = () => dlg.remove();
+    f.who.onchange = () => { $('.free-name', f).hidden = f.who.value !== '__free'; };
+    dlg.addEventListener('click', (e) => { if (e.target === dlg) close(); });
+    $('[data-x=cancel]', f).onclick = close;
+    $('[data-x=del]', f).onclick = (e) => confirmBtn(e.currentTarget, () => { m.sillas.splice(m.sillas.indexOf(c), 1); close(); renderSeating(); saveSeating(); });
+    f.onsubmit = (e) => {
+      e.preventDefault();
+      c.nombre = f.sn.value.trim().slice(0, 30);
+      const v = f.who.value;
+      if (!v) { c.token = ''; c.persona = ''; }
+      else if (v === '__free') { c.token = ''; c.persona = f.fname.value.trim().slice(0, 80); }
+      else if (v !== cur) {
+        const i = v.indexOf('|'), token = v.slice(0, i), persona = v.slice(i + 1);
+        S.seat.mesas.forEach(mm => mm.sillas.forEach(cc => { if (cc !== c && cc.token === token && cc.persona === persona) { cc.token = ''; cc.persona = ''; } }));
+        c.token = token; c.persona = persona;
+      }
+      close(); renderSeating(); saveSeating();
+    };
+    f.who.focus();
+  }
+
+  function promptBox(title, value, done) {
+    const dlg = document.createElement('div'); dlg.className = 'modal';
+    dlg.innerHTML = `<form class="card modal-card form"><h3>${esc(title)}</h3><input name="v" value="${esc(value)}" maxlength="40" required>
+      <div class="actions"><button class="btn primary">Guardar</button><button type="button" class="btn" data-x="c">Cancelar</button></div></form>`;
+    document.body.appendChild(dlg);
+    const f = $('form', dlg); f.v.focus(); f.v.select();
+    $('[data-x=c]', f).onclick = () => dlg.remove();
+    dlg.addEventListener('click', (e) => { if (e.target === dlg) dlg.remove(); });
+    f.onsubmit = (e) => { e.preventDefault(); dlg.remove(); done(f.v.value.trim()); };
+  }
+
+  function saveSeating(now) {
+    const st = $('#seatStatus'); if (st) st.textContent = 'Guardando…';
+    clearTimeout(seatTimer);
+    seatTimer = setTimeout(async () => {
+      try {
+        await API.call('saveSeating', { e: S.ev.id, plan: S.seat }); // el estado local se conserva (los diálogos abiertos apuntan a él)
+        const s2 = $('#seatStatus'); if (s2) s2.textContent = '✓ Guardado';
+        if (S.seat.activo) { S.guests = await API.call('listGuests', { e: S.ev.id }); renderGuests(); }
+      } catch (err) { const s3 = $('#seatStatus'); if (s3) s3.textContent = 'No se pudo guardar'; handleErr(err); }
+    }, now ? 0 : 600);
   }
 
   function renderStats() {
@@ -357,6 +554,7 @@
         ${r.canciones ? `<div><dt>🎵 Canciones pedidas</dt><dd>${r.canciones}</dd></div>` : ''}
       </dl>`;
     const gc = $('#gCount'); if (gc) gc.textContent = S.guests.length;
+    if (S.seat && S.seat.activo && !document.querySelector('.modal')) renderSeating();
   }
 
   function renderGuests() {
@@ -379,7 +577,7 @@
           <p class="meta">${g.lugares} ${g.lugares == 1 ? 'lugar' : 'lugares'}${g.estado === 'confirmó' ? ` · <b>${g.confirmados} asistirán</b>` : ''}${g.personas ? ' · ' + esc(g.personas) : ''}</p>
           ${g.estado === 'confirmó' && g.detalle ? `<p class="meta">✔ ${esc(g.detalle)}</p>` : ''}
           <p class="meta">${g.creado ? 'Creada ' + esc(U.fmtShort(g.creado)) : ''}${g.enviado ? ' · ✉ Enviada ' + esc(U.fmtShort(g.enviado)) : ''}${g.respondido ? ' · Respondió ' + esc(U.fmtShort(g.respondido)) : ''}</p>
-          ${g.mesa ? `<p class="meta">🪑 Mesa ${esc(g.mesa)}</p>` : ''}
+          ${g.mesa ? `<p class="meta">🪑 ${/^\d+$/.test(String(g.mesa)) ? 'Mesa ' : ''}${esc(g.mesa)}</p>` : ''}
           ${ex(g).alergias ? `<p class="meta warn">⚠️ Alergias / restricciones: <b>${esc(ex(g).alergias)}</b></p>` : ''}
           ${ex(g).cancion ? `<p class="meta">🎵 Canción: ${esc(ex(g).cancion)}</p>` : ''}
           ${g.mensaje ? `<blockquote>“${esc(g.mensaje)}”</blockquote>` : ''}

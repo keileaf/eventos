@@ -43,7 +43,7 @@
   };
 
   /* ================= BACKEND DEMO (imita a Code.gs) ================= */
-  const DEMO_KEY = 'inv_demo_v12';
+  const DEMO_KEY = 'inv_demo_v13';
   const Demo = {
     db: null,
     load() {
@@ -183,7 +183,9 @@
         const ev = this.eventFor(this.auth(req), req.e);
         const old = this.guests(ev.id).find(x => x.token === req.token); if (!old) throw new Error('Invitado no encontrado');
         const g = { token: rid(12), nombre: old.nombre, personas: old.personas, lugares: old.lugares, telefono: old.telefono, mesa: old.mesa || '', estado: 'pendiente', confirmados: 0, detalle: '', mensaje: '', respondido: '', enviado: '', creado: now() };
-        this.db.guests[ev.id] = this.guests(ev.id).filter(x => x !== old); this.db.guests[ev.id].push(g); return g;
+        this.db.guests[ev.id] = this.guests(ev.id).filter(x => x !== old); this.db.guests[ev.id].push(g);
+        if (ev.mesas) ev.mesas = JSON.parse(JSON.stringify(ev.mesas).split('"' + old.token + '"').join('"' + g.token + '"'));
+        return g;
       },
       markSent(req) {
         const ev = this.eventFor(this.auth(req), req.e);
@@ -203,6 +205,20 @@
         if (!ev) throw new Error('Evento no encontrado'); ev.activo = false; return true;
       },
       getSite() { return this.db.site || {}; },
+      getSeating(req) {
+        const ev = this.eventFor(this.auth(req), req.e); const p = ev.mesas || {};
+        return { activo: !!p.activo, mesas: p.mesas || [] };
+      },
+      saveSeating(req) {
+        const ev = this.eventFor(this.auth(req), req.e); const p = req.plan || {};
+        ev.mesas = { activo: !!p.activo, mesas: (p.mesas || []).slice(0, 300) };
+        if (ev.mesas.activo) {
+          const where = {};
+          ev.mesas.mesas.forEach(m => (m.sillas || []).forEach(c => { if (c.token) { where[c.token] = where[c.token] || []; if (!where[c.token].includes(m.nombre)) where[c.token].push(m.nombre); } }));
+          this.guests(ev.id).forEach(g => { g.mesa = (where[g.token] || []).join(', '); });
+        }
+        return ev.mesas;
+      },
       saveSite(req) {
         this.auth(req, true); this.db.site = this.db.site || {};
         if (Array.isArray(req.demosOcultas)) this.db.site.demosOcultas = req.demosOcultas.map(String);
@@ -396,6 +412,16 @@
         },
         {
           id: 'andrea-rodrigo', propietario: 'novios.ar', tema: 'boda', activo: true, creado: d(30), actualizado: d(1),
+          mesas: { activo: true, mesas: [
+            { id: 'mh', nombre: 'Mesa de honor', sillas: [
+              { id: 'h1', nombre: 'Novia', token: '', persona: 'Andrea' }, { id: 'h2', nombre: 'Novio', token: '', persona: 'Rodrigo' },
+              { id: 'h3', nombre: '', token: 'Bd5kRt8mWq3Z', persona: 'Mariana Ortiz' }, { id: 'h4', nombre: '', token: 'Bd5kRt8mWq3Z', persona: 'Daniel Ochoa' }] },
+            { id: 'm1', nombre: 'Mesa 1', sillas: [
+              { id: 'a1', nombre: '', token: 'Bd2nHs6vLp9Y', persona: 'Tía Carmen (1)' }, { id: 'a2', nombre: '', token: 'Bd2nHs6vLp9Y', persona: 'Tía Carmen (2)' },
+              { id: 'a3', nombre: '', token: '', persona: '' }, { id: 'a4', nombre: '', token: '', persona: '' }, { id: 'a5', nombre: '', token: '', persona: '' },
+              { id: 'a6', nombre: '', token: '', persona: '' }, { id: 'a7', nombre: '', token: '', persona: '' }, { id: 'a8', nombre: '', token: '', persona: '' }] },
+            { id: 'm2', nombre: 'Mesa 2', sillas: Array.from({ length: 8 }, (_, k) => ({ id: 'b' + k, nombre: '', token: '', persona: '' })) },
+          ] },
           config: {
             tipo: 'boda', festejado: 'Andrea & Rodrigo', edad: '', encabezado: 'Nos casamos',
             frase: 'Después de muchos atardeceres juntos, decidimos compartir todos los que vienen. Queremos que estés ahí.',

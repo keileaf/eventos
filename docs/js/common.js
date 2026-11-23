@@ -37,6 +37,13 @@
     return absolute ? new URL(rel, location.href).href : rel;
   };
 
+  // Enlace a la galería de fotos del evento (QR de fotos)
+  U.photosUrl = (e, absolute, extra) => {
+    const q = 'e=' + encodeURIComponent(e) + (extra ? '&' + extra : '');
+    const rel = window.API && API.forcedDemo ? 'fotos.html?demo=1&' + q : 'fotos.html' + (window.API && API.isDemo ? '#' : '?') + q;
+    return absolute ? new URL(rel, location.href).href : rel;
+  };
+
   U.waUrl = (phone, text) => {
     let digits = String(phone || '').replace(/\D/g, '');
     if (digits.length === 10) digits = '52' + digits; // número mexicano sin lada de país

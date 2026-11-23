@@ -43,7 +43,7 @@
   };
 
   /* ================= BACKEND DEMO (imita a Code.gs) ================= */
-  const DEMO_KEY = 'inv_demo_v13';
+  const DEMO_KEY = 'inv_demo_v14';
   const Demo = {
     db: null,
     load() {
@@ -205,6 +205,28 @@
         if (!ev) throw new Error('Evento no encontrado'); ev.activo = false; return true;
       },
       getSite() { return this.db.site || {}; },
+      getPhotos(req) {
+        const ev = this.db.events.find(e => e.id === req.e && e.activo);
+        if (!ev) throw new Error('Evento no encontrado');
+        if (!ev.config.fotosInvitados) { let ok = false; try { this.eventFor(this.auth(req), req.e); ok = true; } catch (e) {} if (!ok) throw new Error('La galería de fotos no está activa'); }
+        const list = ((this.db.photos || {})[ev.id] || []).slice().sort((a, b) => a.fecha < b.fecha ? 1 : -1);
+        return { evento: { id: ev.id, tema: ev.tema, festejado: ev.config.festejado || '', tipo: ev.config.tipo || '' }, fotos: list };
+      },
+      uploadPhoto(req) {
+        const ev = this.db.events.find(e => e.id === req.e && e.activo);
+        if (!ev) throw new Error('Evento no encontrado');
+        if (!ev.config.fotosInvitados) throw new Error('La galería de fotos no está activa');
+        if (!/^data:image\//.test(req.data || '')) throw new Error('Formato de imagen no válido');
+        this.db.photos = this.db.photos || {}; const arr = this.db.photos[ev.id] = this.db.photos[ev.id] || [];
+        // en el ejemplo solo se guardan las 6 fotos subidas más recientes (el navegador tiene poco espacio)
+        const mine = arr.filter(p => p.local); if (mine.length >= 6) arr.splice(arr.indexOf(mine[0]), 1);
+        const p = { id: rid(10), url: req.data, autor: String(req.autor || '').slice(0, 60), fecha: now(), local: true };
+        arr.push(p); return p;
+      },
+      deletePhoto(req) {
+        const ev = this.eventFor(this.auth(req), req.e);
+        this.db.photos[ev.id] = ((this.db.photos || {})[ev.id] || []).filter(p => p.id !== req.id); return true;
+      },
       getSeating(req) {
         const ev = this.eventFor(this.auth(req), req.e); const p = ev.mesas || {};
         return { activo: !!p.activo, mesas: p.mesas || [] };
@@ -290,6 +312,7 @@
               { p: '¿Hay estacionamiento?', r: 'Sí, el salón tiene estacionamiento gratuito.' },
             ],
             pase: true,
+            fotosInvitados: true,
             firma: '¡Te espera tu equipo! · Daniel y Sofía',
             fechaLimite: '2027-03-01',
             whatsapp: '¡Hola {nombre}! ⚡ Mateo cumple {edad} y te necesita en su equipo de héroes. Aquí está tu invitación: {enlace}',
@@ -325,6 +348,7 @@
             regalos: 'Tu presencia es el mejor regalo. Si deseas tener un detalle, a Valentina le encantan los libros de cuentos.',
             rsvpPreguntas: { alergias: true, cancion: false },
             pase: true,
+            fotosInvitados: true,
             firma: 'Con cariño, Andrea y Luis',
             fechaLimite: '2027-04-10',
             whatsapp: '¡Hola {nombre}! ❄️ Valentina cumple {edad} y su cuento no estaría completo sin ti. Aquí está tu invitación: {enlace}',
@@ -405,6 +429,7 @@
             hashtag: '#CamilaXV',
             hashtagTexto: 'Sube tus fotos y videos con este hashtag para que ningún momento se pierda.',
             pase: true,
+            fotosInvitados: true,
             firma: 'Con cariño, Camila Renata',
             fechaLimite: '2027-09-01',
             whatsapp: '¡Hola {nombre}! 💙 Me encantaría que me acompañes en mis XV años. Aquí está tu invitación: {enlace}',
@@ -480,12 +505,26 @@
               { p: '¿Hasta cuándo puedo confirmar?', r: 'A más tardar el 15 de septiembre, desde esta misma invitación.' },
             ],
             pase: true,
+            fotosInvitados: true,
             firma: 'Con amor, Andrea & Rodrigo',
             fechaLimite: '2027-09-15',
             whatsapp: '¡Hola {nombre}! 💍 Nos casamos y nos encantaría que nos acompañes. Aquí está tu invitación: {enlace}',
           },
         },
       ],
+      photos: {
+        'andrea-rodrigo': [
+          { id: 'ph1', url: 'fotos/boda-galeria-1.jpg', autor: 'Tía Carmen', fecha: d(0.3) },
+          { id: 'ph2', url: 'fotos/boda-historia-2.jpg', autor: 'Mariana', fecha: d(0.2) },
+          { id: 'ph3', url: 'fotos/boda-galeria-2.jpg', autor: '', fecha: d(0.1) },
+          { id: 'ph4', url: 'fotos/boda-historia-1.jpg', autor: 'Daniel', fecha: d(0.05) },
+        ],
+        'camila-xv': [
+          { id: 'px1', url: 'fotos/xv-galeria-2.jpg', autor: 'Gaby', fecha: d(0.2) },
+          { id: 'px2', url: 'fotos/xv-galeria-4.jpg', autor: 'Valeria', fecha: d(0.1) },
+          { id: 'px3', url: 'fotos/xv-galeria-3.jpg', autor: '', fecha: d(0.05) },
+        ],
+      },
       guests: {
         'andrea-rodrigo': [
           Object.assign(g('Bd5kRt8mWq3Z', 'Familia Ortiz Ochoa', 'Mariana Ortiz, Daniel Ochoa', 2, '6645556677', 'pendiente', 0, '', '', '', d(3)), { mesa: '2' }),

@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Galería de fotos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
+  <style>
+    :root { --ink: #22252d; --muted: #737887; --line: #e9e6df; --accent: #1f2f4d; --gold: #b8955a; --bg: #fbf9f5; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.55 'Plus Jakarta Sans', system-ui, sans-serif; }
+    .wrap { max-width: 980px; margin: 0 auto; padding: 0 16px 90px; }
+    header { text-align: center; padding: 34px 10px 18px; }
+    .kick { margin: 0; font-size: .74rem; font-weight: 700; letter-spacing: .28em; text-transform: uppercase; color: var(--gold); }
+    h1 { margin: 6px 0 4px; font: 700 clamp(1.9rem, 7vw, 2.8rem)/1.1 'Cormorant Garamond', Georgia, serif; color: var(--accent); }
+    .sub { margin: 0 auto; max-width: 40ch; color: var(--muted); font-size: .95rem; }
+    .bar { position: sticky; top: 0; z-index: 5; display: flex; gap: 10px; align-items: center; justify-content: center; flex-wrap: wrap; padding: 12px 0; background: rgba(251, 249, 245, .94); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
+    .btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 20px; border-radius: 999px; border: 1.5px solid var(--accent); background: var(--accent); color: #fff; font: 700 .95rem 'Plus Jakarta Sans', sans-serif; cursor: pointer; text-decoration: none; }
+    .btn.line { background: #fff; color: var(--accent); }
+    .btn:disabled { opacity: .5; cursor: default; }
+    .ico { width: 20px; height: 20px; }
+    .name { padding: 11px 16px; border-radius: 999px; border: 1px solid var(--line); background: #fff; font: inherit; min-width: 0; width: 200px; }
+    .count { color: var(--muted); font-size: .85rem; width: 100%; text-align: center; }
+    .grid { columns: 2 170px; column-gap: 10px; margin-top: 8px; }
+    .ph { break-inside: avoid; margin: 0 0 10px; position: relative; border-radius: 14px; overflow: hidden; background: #eee; cursor: zoom-in; animation: in .4s ease both; }
+    .ph img { display: block; width: 100%; height: auto; min-height: 120px; object-fit: cover; }
+    .ph figcaption { position: absolute; left: 0; right: 0; bottom: 0; padding: 18px 10px 8px; font-size: .75rem; color: #fff; background: linear-gradient(transparent, rgba(0,0,0,.55)); }
+    @keyframes in { from { opacity: 0; transform: translateY(8px) } }
+    .empty { margin: 30px auto; max-width: 340px; padding: 34px 20px; text-align: center; border: 1.5px dashed var(--line); border-radius: 20px; background: #fff; }
+    .empty .big { font-size: 46px; }
+    .empty b { display: block; margin: 8px 0 4px; font: 700 1.3rem 'Cormorant Garamond', serif; color: var(--accent); }
+    .empty p { margin: 0; color: var(--muted); font-size: .9rem; }
+    .msg { margin: 60px auto; text-align: center; color: var(--muted); }
+    /* confirmación antes de subir */
+    .modal { position: fixed; inset: 0; z-index: 20; background: rgba(20, 22, 28, .6); display: grid; place-items: center; padding: 16px; }
+    .modal[hidden] { display: none; }
+    .sheet { width: min(420px, 100%); background: #fff; border-radius: 20px; padding: 16px; text-align: center; }
+    .previews { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 6px; max-height: 46vh; overflow: auto; }
+    .previews img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 8px; }
+    .sheet h3 { margin: 12px 0 4px; font: 700 1.25rem 'Cormorant Garamond', serif; }
+    .sheet .row { display: flex; gap: 8px; justify-content: center; margin-top: 12px; }
+    .prog { height: 6px; border-radius: 3px; background: #eee; overflow: hidden; margin-top: 12px; }
+    .prog i { display: block; height: 100%; width: 0; background: var(--gold); transition: width .3s; }
+    /* visor */
+    .lb { position: fixed; inset: 0; z-index: 30; background: rgba(10, 10, 12, .94); display: grid; place-items: center; padding: 40px 10px; }
+    .lb[hidden] { display: none; }
+    .lb img { max-width: 100%; max-height: 100%; border-radius: 8px; }
+    .lb button { position: absolute; border: 0; background: rgba(255,255,255,.14); color: #fff; width: 46px; height: 46px; border-radius: 50%; font-size: 1.6rem; cursor: pointer; }
+    .lb .x { top: 12px; right: 12px; } .lb .p { left: 10px; top: 50%; } .lb .n { right: 10px; top: 50%; }
+    .lb .cap { position: absolute; bottom: 14px; left: 0; right: 0; text-align: center; color: #ddd; font-size: .85rem; }
+    #toasts { position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%); z-index: 40; display: grid; gap: 8px; width: min(92vw, 400px); }
+    .toast { padding: 12px 16px; border-radius: 12px; background: #2b2b2b; color: #fff; font-size: .92rem; transition: opacity .4s; }
+    .toast.error { background: #b4453a; } .toast.ok { background: #3f7d5a; } .toast.out { opacity: 0; }
+    /* tarjeta para imprimir */
+    .card-print { display: none; }
+    body.print-card .wrap { display: none; }
+    body.print-card .card-print { display: grid; place-items: center; min-height: 100vh; padding: 20px; }
+    .tarjeta { width: min(400px, 100%); padding: 34px 28px; text-align: center; background: #fff; border: 1px solid var(--line); border-radius: 18px; box-shadow: 0 20px 40px -30px rgba(0,0,0,.4); }
+    .tarjeta h2 { margin: 6px 0 2px; font: 700 2.2rem/1.1 'Cormorant Garamond', serif; color: var(--accent); }
+    .tarjeta .qr { width: 220px; height: 220px; margin: 18px auto; }
+    .tarjeta .qr svg { width: 100%; height: 100%; }
+    .tarjeta ol { text-align: left; margin: 0 auto; padding-left: 20px; max-width: 250px; color: var(--muted); font-size: .95rem; }
+    .print-tools { margin-top: 18px; display: flex; gap: 8px; justify-content: center; }
+    @media print { .print-tools { display: none; } .tarjeta { box-shadow: none; } body { background: #fff; } }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <p class="kick">Galería del evento</p>
+      <h1 id="title">Fotos</h1>
+      <p class="sub">Sube tus fotos y videos favoritos del día. Todos los invitados podrán verlas aquí.</p>
+    </header>
+    <div class="bar" id="bar" hidden>
+      <input class="name" id="autor" maxlength="60" placeholder="Tu nombre (opcional)">
+      <label class="btn" id="pick"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M7 9l5-5 5 5M4 20h16"/></svg> Subir fotos<input type="file" id="file" accept="image/*" multiple hidden></label>
+      <span class="count" id="count"></span>
+    </div>
+    <div id="grid"></div>
+  </div>
+
+  <div class="card-print"><div class="tarjeta">
+    <p class="kick">Comparte tus fotos</p>
+    <h2 id="cTitle"></h2>
+    <div class="qr" id="cQr"></div>
+    <ol><li>Escanea el código con la cámara de tu celular.</li><li>Sube tus mejores fotos del evento.</li><li>Disfruta todas las fotos en la galería.</li></ol>
+    <div class="print-tools"><button class="btn" onclick="window.print()">Imprimir</button><a class="btn line" id="cBack">Ver galería</a></div>
+  </div></div>
+
+  <div class="modal" id="confirm" hidden><div class="sheet">
+    <div class="previews" id="previews"></div>
+    <h3 id="cq">¿Subir estas fotos?</h3>
+    <div class="prog" id="prog" hidden><i></i></div>
+    <div class="row"><button class="btn line" id="cancel">Cancelar</button><button class="btn" id="go">Subir</button></div>
+  </div></div>
+
+  <div class="lb" id="lb" hidden><button class="x" aria-label="Cerrar">×</button><button class="p" aria-label="Anterior">‹</button><img alt=""><button class="n" aria-label="Siguiente">›</button><div class="cap"></div></div>
+
+  <script src="js/config.js"></script>
+  <script src="js/common.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/qr.js"></script>
+  <script>
+  (function () {
+    const { esc, $ } = U;
+    const e = U.params().e;
+    const card = /(^|[?&#])tarjeta=1/.test(location.search + location.hash);
+    let fotos = [], pending = [], k = 0;
+    try { $('#autor').value = localStorage.getItem('inv_autor') || ''; } catch (x) {}
+
+    async function load() {
+      if (!e) return fail('Este enlace no contiene un evento.');
+      try {
+        const data = await API.call('getPhotos', { e });
+        const ev = data.evento;
+        const t = ev.tipo === 'xv' ? 'XV años de ' + ev.festejado : ev.tipo === 'boda' ? ev.festejado : 'Fiesta de ' + ev.festejado;
+        document.title = 'Fotos · ' + t;
+        $('#title').textContent = t; $('#cTitle').textContent = t;
+        if (card) return showCard();
+        fotos = data.fotos; $('#bar').hidden = false; paint();
+      } catch (err) { fail(err.message); }
+    }
+    function fail(m) { $('#grid').innerHTML = `<p class="msg">${esc(m)}</p>`; }
+
+    function paint() {
+      $('#count').textContent = fotos.length ? fotos.length + (fotos.length === 1 ? ' foto' : ' fotos') : '';
+      $('#grid').innerHTML = fotos.length
+        ? `<div class="grid">${fotos.map((f, i) => `<figure class="ph" data-i="${i}"><img src="${esc(f.url)}" alt="" loading="lazy">${f.autor ? `<figcaption>${esc(f.autor)}</figcaption>` : ''}</figure>`).join('')}</div>`
+        : `<div class="empty"><div class="big">📸</div><b>Aún no hay fotos</b><p>¡Sé la primera persona en compartir un recuerdo especial!</p></div>`;
+      document.querySelectorAll('.ph').forEach(el => el.onclick = () => openLb(+el.dataset.i));
+    }
+
+    // Reduce la foto en el celular antes de subirla (más rápido y ligero)
+    function shrink(file, max) {
+      return new Promise((res, rej) => {
+        const url = URL.createObjectURL(file), img = new Image();
+        img.onload = () => {
+          const s = Math.min(1, max / Math.max(img.width, img.height));
+          const c = document.createElement('canvas'); c.width = Math.round(img.width * s); c.height = Math.round(img.height * s);
+          c.getContext('2d').drawImage(img, 0, 0, c.width, c.height); URL.revokeObjectURL(url);
+          res(c.toDataURL('image/jpeg', .82));
+        };
+        img.onerror = () => { URL.revokeObjectURL(url); rej(new Error('No se pudo leer la imagen')); };
+        img.src = url;
+      });
+    }
+
+    $('#file').onchange = async (ev) => {
+      const files = Array.from(ev.target.files || []).filter(f => /^image\//.test(f.type) || /\.(jpe?g|png|heic|webp)$/i.test(f.name)).slice(0, 20);
+      ev.target.value = '';
+      if (!files.length) return;
+      pending = [];
+      for (const f of files) { try { pending.push(await shrink(f, API.isDemo ? 1000 : 1600)); } catch (x) {} }
+      if (!pending.length) return U.toast('No se pudieron leer las fotos', 'error');
+      $('#previews').innerHTML = pending.map(d => `<img src="${d}" alt="">`).join('');
+      $('#cq').textContent = pending.length === 1 ? '¿Deseas subir esta foto?' : `¿Deseas subir estas ${pending.length} fotos?`;
+      $('#prog').hidden = true; $('#go').disabled = false; $('#confirm').hidden = false;
+    };
+    $('#cancel').onclick = () => { $('#confirm').hidden = true; pending = []; };
+    $('#go').onclick = async () => {
+      const autor = $('#autor').value.trim();
+      try { localStorage.setItem('inv_autor', autor); } catch (x) {}
+      $('#go').disabled = true; $('#prog').hidden = false;
+      let ok = 0;
+      for (let i = 0; i < pending.length; i++) {
+        try { fotos.unshift(await API.call('uploadPhoto', { e, data: pending[i], autor })); ok++; } catch (err) { U.toast(err.message, 'error'); }
+        $('#prog i').style.width = ((i + 1) / pending.length * 100) + '%';
+      }
+      $('#confirm').hidden = true; pending = []; paint();
+      if (ok) U.toast(ok === 1 ? '¡Tu foto ya está en la galería!' : `¡${ok} fotos subidas!`, 'ok');
+    };
+
+    function openLb(i) { k = i; $('#lb').hidden = false; show(); }
+    function show() { const f = fotos[k]; $('#lb img').src = f.url; $('#lb .cap').textContent = f.autor ? 'Foto de ' + f.autor : ''; }
+    $('#lb .x').onclick = () => $('#lb').hidden = true;
+    $('#lb .p').onclick = () => { k = (k - 1 + fotos.length) % fotos.length; show(); };
+    $('#lb .n').onclick = () => { k = (k + 1) % fotos.length; show(); };
+    $('#lb').onclick = (ev) => { if (ev.target.id === 'lb') $('#lb').hidden = true; };
+
+    function showCard() {
+      document.body.classList.add('print-card');
+      const url = U.photosUrl(e, true);
+      $('#cQr').innerHTML = QR.svg(url, { margin: 1 });
+      $('#cBack').href = U.photosUrl(e);
+    }
+    load();
+  })();
+  </script>
+</body>
+</html>

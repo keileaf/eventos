@@ -185,7 +185,7 @@
     if (tipo === 'boda') return {
       tipo, festejado, edad: '', encabezado: 'Nos casamos',
       frase: 'Con la bendición de Dios y de nuestros padres, queremos compartir contigo el día en que uniremos nuestras vidas.',
-      cita: '', fecha, duracionHoras: 8, fotoPortada: '', galeria: [], historia: [], pase: true, rsvpPreguntas: { alergias: true, cancion: true },
+      cita: '', fecha, duracionHoras: 8, fotoPortada: '', galeria: [], historia: [], pase: true, fotosInvitados: true, rsvpPreguntas: { alergias: true, cancion: true },
       faq: [{ p: '¿Pueden ir niños?', r: '' }, { p: '¿Habrá estacionamiento?', r: '' }],
       musica: 'https://upload.wikimedia.org/wikipedia/commons/c/c6/Canon_in_D_Major_(ISRC_USUAN1100301).mp3', musicaCredito: 'Canon in D Major — Kevin MacLeod (incompetech.com), CC BY 3.0',
       padres: [{ titulo: 'Padres de la novia', nombres: [] }, { titulo: 'Padres del novio', nombres: [] }, { titulo: 'Padrinos', nombres: [] }],
@@ -197,7 +197,7 @@
     if (tipo === 'xv') return {
       tipo, festejado, edad: '', encabezado: 'Mis XV años',
       frase: 'Hay momentos que se esperan toda la vida. Quiero compartir contigo el inicio de esta nueva etapa.',
-      cita: '', fecha, duracionHoras: 7, fotoPortada: '', galeria: [], musica: 'cajita', pase: true,
+      cita: '', fecha, duracionHoras: 7, fotoPortada: '', galeria: [], musica: 'cajita', pase: true, fotosInvitados: true,
       padres: [{ titulo: 'Mis padres', nombres: [] }, { titulo: 'Mis padrinos', nombres: [] }],
       lugares: [{ titulo: 'Misa de acción de gracias', hora: '', nombre: '', direccion: '', mapa: '', croquis: '' }, { titulo: 'Recepción', hora: '', nombre: '', direccion: '', mapa: '', croquis: '' }],
       horario: [], vestimenta: 'Formal', regalos: '', firma: '',
@@ -293,6 +293,9 @@
           <h2 class="sec">Estadísticas</h2>
           <div class="card" id="stats"></div>
 
+          <h2 class="sec">QR de fotos</h2>
+          <div class="card" id="photosBox"><p class="meta">Cargando…</p></div>
+
           <h2 class="sec">Evento</h2>
           <details class="card fold"><summary>Editar datos de la invitación</summary>${eventForm(ev)}</details>
 
@@ -318,6 +321,7 @@
     bindTop();
     renderStats(); renderGuests();
     loadSeating();
+    loadPhotos();
 
     $('#search').oninput = (e) => { S.q = e.target.value; renderGuests(); };
     $$('#chips .chip').forEach(b => b.onclick = () => { S.filter = b.dataset.f; $$('#chips .chip').forEach(x => x.classList.toggle('on', x === b)); renderGuests(); });
@@ -337,6 +341,34 @@
       catch (err) { handleErr(err); }
     };
     bindEventForm();
+  }
+
+  // ================= QR DE FOTOS =================
+  async function loadPhotos() {
+    const box = $('#photosBox'); if (!box) return;
+    const on = !!(S.ev.config || {}).fotosInvitados;
+    let fotos = [];
+    try { fotos = (await API.call('getPhotos', { e: S.ev.id })).fotos || []; } catch (e) {}
+    const url = U.photosUrl(S.ev.id, true);
+    box.innerHTML = `
+      <label class="tg-row"><span><b>Galería de fotos de invitados</b><br><span class="meta">Los invitados escanean un QR, suben sus fotos y todos las ven.</span></span>
+        <span class="tg"><input type="checkbox" id="phOn" ${on ? 'checked' : ''}><i></i></span></label>
+      ${on ? `<p class="meta">${fotos.length} ${fotos.length === 1 ? 'foto' : 'fotos'} subidas</p>
+        <div class="actions"><a class="btn sm primary" href="${esc(U.photosUrl(S.ev.id))}" target="_blank">Abrir galería</a>
+        <button class="btn sm" id="phCopy">Copiar enlace</button>
+        <a class="btn sm" href="${esc(U.photosUrl(S.ev.id, false, 'tarjeta=1'))}" target="_blank">Tarjeta QR para imprimir</a></div>
+        ${fotos.length ? `<p class="hint" style="margin-top:12px">Toca ✕ para quitar una foto que no deba estar.</p>
+        <div class="ph-mod">${fotos.map(f => `<div class="ph-t"><img src="${esc(f.url)}" alt="" loading="lazy"><button data-del="${esc(f.id)}" title="Eliminar foto">✕</button>${f.autor ? `<span>${esc(f.autor)}</span>` : ''}</div>`).join('')}</div>` : ''}`
+      : `<p class="hint">Al activarla, la invitación muestra una sección "Comparte tus fotos" con su código QR.</p>`}`;
+    $('#phOn').onchange = async (e) => {
+      const config = Object.assign({}, S.ev.config, { fotosInvitados: e.target.checked });
+      try { S.ev = await API.call('updateEvent', { e: S.ev.id, config }); U.toast(e.target.checked ? 'QR de fotos activado' : 'QR de fotos desactivado', 'ok'); loadPhotos(); }
+      catch (err) { e.target.checked = !e.target.checked; handleErr(err); }
+    };
+    const cp = $('#phCopy'); if (cp) cp.onclick = async () => { (await U.copy(url)) ? U.toast('Enlace de la galería copiado', 'ok') : U.toast(url); };
+    $$('[data-del]', box).forEach(b => b.onclick = () => confirmBtn(b, async () => {
+      await API.call('deletePhoto', { e: S.ev.id, id: b.dataset.del }); U.toast('Foto eliminada', 'ok'); loadPhotos();
+    }));
   }
 
   // ================= MESAS Y ACOMODO =================
@@ -684,6 +716,7 @@
         <div class="row2"><label>Hashtag<input name="hashtag" value="${esc(c.hashtag)}" placeholder="#CamilaXV"></label><label>Álbum compartido (enlace)<input name="album" value="${esc(c.album)}" placeholder="https://photos.app.goo.gl/…"></label></div>
         <label>Fotos a lo ancho entre secciones (hasta 3, una por línea: <code>foto | frase | firma</code>)<textarea name="separadores" rows="3" placeholder="fotos/sep-1.jpg | Hoy empieza mi historia | Camila">${esc((c.separadores || []).map(x => [x.foto, x.texto, x.autor].map(y => y || '').join(' | ')).join('\n'))}</textarea></label>
         <label class="inline"><input type="checkbox" name="pase" ${c.pase ? 'checked' : ''}> Pase de acceso con código QR al confirmar</label>
+        <label class="inline"><input type="checkbox" name="fotosInvitados" ${c.fotosInvitados ? 'checked' : ''}> QR de fotos: los invitados suben fotos a la galería del evento</label>
         <label class="inline"><input type="checkbox" name="q_alergias" ${(c.rsvpPreguntas || {}).alergias ? 'checked' : ''}> Preguntar alergias al confirmar</label>
         <label class="inline"><input type="checkbox" name="q_cancion" ${(c.rsvpPreguntas || {}).cancion ? 'checked' : ''}> Pedir una canción al confirmar</label>
         <label>Hospedaje (uno por línea: <code>nombre | nota | enlace</code>)<textarea name="hospedaje" rows="2" placeholder="Hotel Centro | A 5 min, código BODA | https://…">${esc((c.hospedaje || []).map(h => [h.nombre, h.nota, h.url].map(x => x || '').join(' | ')).join('\n'))}</textarea></label>
@@ -739,6 +772,7 @@
         separadores: f.separadores.value.split('\n').map(x => x.split('|').map(y => y.trim())).filter(p => p[0]).slice(0, 3).map((p, i) => ({ foto: p[0], texto: p[1] || '', autor: p[2] || '', pos: (((S.ev.config || {}).separadores || [])[i] || {}).pos || '' })),
         pase: f.pase.checked,
         rsvpPreguntas: { alergias: f.q_alergias.checked, cancion: f.q_cancion.checked },
+        fotosInvitados: f.fotosInvitados.checked,
         hospedaje: f.hospedaje.value.split('\n').map(x => x.split('|').map(y => y.trim())).filter(p => p[0]).map(p => ({ nombre: p[0], nota: p[1] || '', url: p[2] || '' })),
         faq: f.faq.value.split('\n').map(x => { const i = x.indexOf('|'); return i < 0 ? { p: x.trim(), r: '' } : { p: x.slice(0, i).trim(), r: x.slice(i + 1).trim() }; }).filter(x => x.p),
         historia: f.historia.value.split('\n').map(x => x.split('|').map(y => y.trim())).filter(p => p.some(Boolean)).map(p => ({ fecha: p[0] || '', titulo: p[1] || '', texto: p[2] || '', foto: p[3] || '' })),

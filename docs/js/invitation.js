@@ -174,6 +174,16 @@
           ${safeUrl(cfg.album) ? `<a class="btn sm" href="${esc(cfg.album)}" target="_blank" rel="noopener">${icon('camera')} Subir mis fotos</a>` : ''}
         </section>` : ''}
 
+        ${cfg.fotosInvitados ? `
+        <section class="card photoqr reveal">
+          ${deco(th, 'photos')}
+          <h2 class="sec-title">${esc(L.photos || 'Comparte tus fotos')}</h2>
+          <p>Escanea el código o toca el botón para subir tus mejores momentos. Todos podremos verlos en la galería del evento.</p>
+          <div class="pq-box"><div class="pq-qr" id="photoQr"></div>
+            <ol class="pq-steps"><li><b>Escanea</b> el código con tu celular</li><li><b>Sube</b> tus fotos en segundos</li><li><b>Disfruta</b> todas las fotos en la galería</li></ol></div>
+          <a class="btn" href="${esc(U.photosUrl(state.evento.id))}" target="_blank" rel="noopener">${icon('camera')} Abrir galería y subir fotos</a>
+        </section>` : ''}
+
         ${(cfg.faq || []).filter(f => f && f.p).length ? `
         <section class="card faq reveal">
           ${deco(th, 'faq')}
@@ -207,6 +217,7 @@
     bindCover();
     bindRsvp();
     drawQr();
+    drawPhotoQr();
     bindPlaces();
     bindGallery(galeria);
     bindCopy();
@@ -285,6 +296,13 @@
     const text = location.href;
     const paint = () => { try { box.innerHTML = QR.svg(text, { level: 'M' }); } catch (e) { box.innerHTML = '<span class="small">QR</span>'; } };
     if (window.QR) paint(); else U.loadJs('js/qr.js').then(paint).catch(() => { box.innerHTML = '<span class="small">QR</span>'; });
+  }
+
+  function drawPhotoQr() {
+    const box = $('#photoQr'); if (!box) return;
+    const url = U.photosUrl(state.evento.id, true);
+    const paint = () => { try { box.innerHTML = QR.svg(url, { level: 'M' }); } catch (e) {} };
+    if (window.QR) paint(); else U.loadJs('js/qr.js').then(paint).catch(() => {});
   }
 
   function deco(th, where) { return th.deco && th.deco[where] ? `<div class="deco deco-${where}" aria-hidden="true">${th.deco[where]}</div>` : ''; }

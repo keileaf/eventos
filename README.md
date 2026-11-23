@@ -11,7 +11,7 @@ docs/                    → sitio estático (GitHub Pages publica esta carpeta)
   fotos/                 → fotos de los eventos (las demo-*.svg son ilustraciones de ejemplo)
   musica/                → canciones .mp3
   js/config.js           → URL de la API y lista de diseños
-  themes/<tema>.css/.js  → diseño de cada evento: espacial, jardin, xv…
+  themes/<tema>.css/.js  → diseño de cada evento: espacial, heroe, jardin, xv, xv-azul, boda…
 ```
 
 ## Quién puede hacer qué
@@ -79,6 +79,8 @@ docs/                    → sitio estático (GitHub Pages publica esta carpeta)
 - **Con Google Drive:** comparte el archivo como *Cualquier persona con el enlace* y pega el enlace. Funciona bien para fotos. Para música es menos confiable, mejor usa GitHub.
 - Usa fotos de **máximo 1600 px** de ancho (JPG, calidad 80) para que carguen rápido en el celular.
 - En *Música* puedes escribir `cajita` para usar la caja musical incluida, que no necesita archivo.
+- Música de boda libre: el diseño de boda trae por defecto *Canon in D Major* (Pachelbel), en la versión de Kevin MacLeod (incompetech.com), con licencia **CC BY 3.0**. Se puede usar gratis siempre que aparezca el crédito, y la invitación lo muestra al pie. Para que no dependa de otro sitio, descarga el .mp3 desde incompetech.com, súbelo a `docs/musica/` y escribe esa ruta en el panel.
+- **Nuestra historia** (bodas): en el panel escribe una línea por momento, `fecha | título | texto | foto`.
 - La música empieza cuando el invitado toca **Abrir invitación**, porque los celulares no permiten reproducir audio sin un toque. Hay un botón flotante para pausarla.
 
 ### Qué guarda cada pestaña
@@ -92,14 +94,66 @@ Puedes **leer** las pestañas directamente, por ejemplo para filtrar o imprimir 
 
 ---
 
-## Probar sin instalar nada (modo demo)
+## Modo demo (ejemplos para mostrar a clientes)
 
-Si `API_URL` está vacío, todo funciona en el navegador con datos de ejemplo:
-`admin / admin123` · `familia.mateo / mateo123` · `familia.vale / vale123` · `familia.sofia / sofia123`
+Agrega `?demo=1` a la dirección y el sitio usa datos de ejemplo guardados solo en el navegador. Así **no toca tu hoja de cálculo**:
+
+- Ejemplos: `https://TU-USUARIO.github.io/REPO/?demo=1`
+- Panel de prueba: `…/panel.html?demo=1`
+- Cuenta de ejemplo para clientes: `novios.ar / boda123` (organizador). La del super usuario de ejemplo no se publica.
+
+Los enlaces de invitación que se copian en modo demo llevan `?demo=1` y se pueden compartir. Cada persona ve su propia copia de los datos de ejemplo. Si `API_URL` está vacío, el sitio entero funciona en modo demo.
+
+## Nota sobre personajes con derechos
+
+Los diseños no usan personajes de marcas (superhéroes, princesas de películas, etc.) ni sus imágenes. Están protegidos y una invitación publicada en internet podría recibir reclamos. Para fans de un personaje se usa un diseño inspirado en el género, como `heroe`, donde el festejado es el héroe.
+
+## Demos de la portada
+
+En el panel del super usuario, en la pestaña *Eventos*, la sección **"Demos en la página principal"** tiene un interruptor por demo y se guarda al instante. La lista de demos está en `DEMOS`, dentro de `docs/js/config.js`. La selección se guarda en las *Propiedades del script* de Apps Script, así que requiere el `Code.gs` actualizado y una **nueva versión** de la implementación.
+
+## QR de fotos
+
+Los invitados escanean un QR, suben sus fotos desde el celular y todos las ven en la galería del evento (`fotos.html?e=ID`).
+- Se activa por evento: en el panel, en la tarjeta **"QR de fotos"**, o en *Extras premium*.
+- La invitación muestra la sección **"Comparte tus fotos"** con su QR y un botón.
+- En el panel están **Abrir galería**, **Copiar enlace**, **Tarjeta QR para imprimir** (para las mesas) y la opción de **quitar fotos** que no deban estar.
+- Las fotos se reducen en el celular antes de subirse y se guardan en Google Drive, en la carpeta *"Invitaciones · Fotos de invitados"*, con una subcarpeta por evento.
+
+**Importante:** esta función usa Google Drive. Después de pegar el nuevo `Code.gs`, **ejecuta `setup` otra vez** para aceptar el permiso de Drive y publica una **nueva versión** de la implementación.
+
+## Mesas y acomodo
+
+En el panel de cada evento, la sección **"Mesas y acomodo"** tiene un interruptor que activa o apaga la función. Al apagarla, el acomodo se conserva.
+- Crea varias mesas a la vez (por ejemplo, *5 mesas de 8 sillas*) o agrega una mesa suelta con el número de sillas que quieras.
+- Cada silla se numera sola o se le puede poner nombre ("Novia", "A1"…).
+- Toca una silla para asignar a una persona, moverla de otra mesa, escribir otro nombre, vaciarla o eliminarla.
+- Por mesa se puede cambiar el nombre, agregar o quitar sillas, vaciarla o eliminarla.
+- Se ven las personas sin lugar. Las que confirmaron aparecen en verde.
+- La mesa se escribe sola en cada invitado y aparece en su **pase con QR**.
+- El acomodo no aparece en la invitación pública: solo lo ven el organizador y el super usuario.
+
+Requiere el `Code.gs` actualizado (columna `mesas` en la hoja *Eventos*, que se agrega sola) y una **nueva versión** de la implementación.
+
+## Funciones premium (cualquier diseño)
+
+Se activan desde el panel, en *Editar datos de la invitación*:
+- **Pase de acceso con QR**: aparece en cuanto el invitado confirma. El QR se genera dentro del sitio (`js/qr.js`), sin depender de otros servicios.
+- **Paleta de vestimenta** y **color reservado** para la festejada.
+- **Mesa de regalos** (tienda, número y enlace) y **lluvia de sobres** con CLABE y botón para copiarla.
+- **Hashtag** y enlace a un **álbum compartido** para que los invitados suban sus fotos.
+- **Fotos a lo ancho entre secciones** con frase y efecto parallax (hasta 3).
+- Íconos automáticos en el itinerario (misa, recepción, vals, cena, pastel, baile…).
+- **Preguntas al confirmar**: alergias o restricciones alimentarias y canción que no puede faltar. El organizador las ve en cada invitado, en las estadísticas y en el CSV.
+- **Mesa asignada**: se captura por invitado en el panel y aparece en su pase.
+- **Hospedaje** recomendado y **preguntas frecuentes** desplegables.
+- **Varios eventos** (ceremonia, recepción, tornaboda…), cada uno con su mapa.
+
+> Esta versión agregó las columnas `mesa` y `extras` a las hojas de invitados. Después de pegar el nuevo `Code.gs`, publica una **nueva versión** (Implementar → Gestionar implementaciones → Editar → Nueva versión). Las hojas de eventos existentes se actualizan solas la próxima vez que se usan.
 
 ## Agregar un diseño nuevo
 
-1. Copia `themes/xv.css` y `themes/xv.js` con otro nombre, por ejemplo `boda-olivo`.
+1. Copia `themes/xv.css` y `themes/xv.js` con otro nombre, por ejemplo `boda-olivo`. Si el diseño necesita una portada completamente distinta, como `xv-azul`, usa `fullHero: true` y arma la portada en `hero()`.
 2. Cambia los colores (variables `--accent`, `--font-name`…), las ilustraciones y las animaciones.
 3. Agrégalo a `TEMAS` en `config.js`. Ya aparece en el panel.
 

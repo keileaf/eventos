@@ -337,3 +337,9 @@ body.lb-open { overflow: hidden; }
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
   .reveal { opacity: 1; transform: none; }
 }
+
+/* QR de fotos */
+.photoqr .pq-box { display: flex; gap: 18px; align-items: center; justify-content: center; margin: 16px 0 18px; text-align: left; flex-wrap: wrap; }
+.pq-qr { width: 132px; height: 132px; padding: 8px; background: #fff; border-radius: 12px; box-shadow: 0 8px 20px -12px rgba(0,0,0,.4); flex: none; }
+.pq-qr svg { width: 100%; height: 100%; display: block; }
+.pq-steps { margin: 0; padding-left: 20px; display: grid; gap: 6px; font-size: .95rem; max-width: 230px; }

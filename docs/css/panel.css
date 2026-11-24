@@ -166,3 +166,5 @@ blockquote { margin: 6px 0 0; padding: 6px 10px; border-left: 3px solid var(--li
 .ph-t button { position: absolute; top: 4px; right: 4px; width: 26px; height: 26px; border-radius: 50%; border: 0; background: rgba(0,0,0,.6); color: #fff; cursor: pointer; font-size: .8rem; }
 .ph-t button.armed { background: var(--red); width: auto; padding: 0 8px; border-radius: 13px; }
 .ph-t span { position: absolute; left: 0; right: 0; bottom: 0; padding: 10px 6px 4px; font-size: .68rem; color: #fff; background: linear-gradient(transparent, rgba(0,0,0,.6)); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.adv { margin-top: 14px; font-size: .85rem; } .adv summary { cursor: pointer; } .adv textarea { margin: 8px 0; font-family: ui-monospace, Menlo, monospace; font-size: .78rem; }

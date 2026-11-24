@@ -681,6 +681,7 @@
       <div class="row2"><label>Tipo<select name="tipo">${Object.entries(CFG.TIPOS).map(([k, v]) => `<option value="${k}" ${c.tipo === k ? 'selected' : ''}>${v}</option>`).join('')}</select></label>
       <label>Diseño<select name="tema">${Object.entries(CFG.TEMAS).filter(([k, v]) => !v.privado || S.me.rol === 'admin' || ev.tema === k).map(([k, v]) => `<option value="${k}" ${ev.tema === k ? 'selected' : ''}>${esc(v.nombre)}</option>`).join('')}</select></label></div>
       <label>Encabezado<input name="encabezado" value="${esc(c.encabezado)}"></label>
+      <label>Título o carrera (graduaciones)<input name="titulo" value="${esc(c.titulo)}" placeholder="Licenciada en Psicología"></label>
       <label>Frase principal<textarea name="frase" rows="2">${esc(c.frase)}</textarea></label>
       <div class="row2"><label>Fecha y hora<input name="fecha" type="datetime-local" value="${esc(c.fecha)}"></label>
       <label>Duración (horas)<input name="duracionHoras" type="number" min="1" max="24" value="${esc(c.duracionHoras || 4)}"></label></div>
@@ -726,7 +727,11 @@
       <label>Confirmar antes de<input name="fechaLimite" type="date" value="${esc(c.fechaLimite)}"></label>
       <label>Mensaje de WhatsApp <span class="hint">({nombre}, {festejado}, {edad}, {enlace})</span><textarea name="whatsapp" rows="3">${esc(c.whatsapp)}</textarea></label>
       <div class="actions"><button class="btn primary">Guardar cambios</button><a class="btn" href="${esc(U.inviteUrl(ev.id))}" target="_blank">Ver invitación</a></div>
-    </form>`;
+    </form>
+    ${S.me.rol === 'admin' ? `<details class="adv"><summary>Avanzado: pegar configuración completa</summary>
+      <p class="hint">Pega aquí la configuración que te preparen (texto que empieza con <code>{</code>). Se combina con la actual y se guarda.</p>
+      <textarea id="cfgJson" rows="6" placeholder='{ "titulo": "…" }'></textarea>
+      <button type="button" class="btn sm primary" id="cfgApply">Aplicar configuración</button></details>` : ''}`;
   }
 
   function placesOf(c) {
@@ -747,6 +752,16 @@
 
   function bindEventForm() {
     const f = $('#evForm');
+    const ap = $('#cfgApply');
+    if (ap) ap.onclick = async () => {
+      let data;
+      try { data = JSON.parse($('#cfgJson').value); } catch (e) { return U.toast('El texto no es una configuración válida', 'error'); }
+      const tema = data.tema; delete data.tema;
+      try {
+        S.ev = await API.call('updateEvent', Object.assign({ e: S.ev.id, config: Object.assign({}, S.ev.config, data) }, tema ? { tema } : {}));
+        U.toast('Configuración aplicada', 'ok'); renderEvent();
+      } catch (err) { handleErr(err); }
+    };
     const box = $('#placesBox');
     $('#addPlace').onclick = () => box.insertAdjacentHTML('beforeend', placeFields());
     box.addEventListener('click', (e) => { if (e.target.classList.contains('rm-place')) e.target.closest('.place-f').remove(); });
@@ -754,7 +769,7 @@
       e.preventDefault();
       const config = Object.assign({}, S.ev.config, {
         festejado: f.festejado.value.trim(), edad: f.edad.value ? Number(f.edad.value) : '', tipo: f.tipo.value,
-        encabezado: f.encabezado.value, frase: f.frase.value, fecha: f.fecha.value, duracionHoras: Number(f.duracionHoras.value) || 4,
+        encabezado: f.encabezado.value, titulo: f.titulo.value.trim(), frase: f.frase.value, fecha: f.fecha.value, duracionHoras: Number(f.duracionHoras.value) || 4,
         lugar: undefined,
         lugares: $$('.place-f', f).map(pf => ({ titulo: $('[name=p_titulo]', pf).value.trim(), hora: $('[name=p_hora]', pf).value.trim(), nombre: $('[name=p_nombre]', pf).value.trim(), direccion: $('[name=p_dir]', pf).value.trim(), mapa: $('[name=p_mapa]', pf).value.trim(), croquis: $('[name=p_croquis]', pf).value.trim() })).filter(p => p.nombre),
         cita: f.cita.value.trim(),

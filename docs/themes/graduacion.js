@@ -57,8 +57,14 @@
     },
 
     afterRender() {
-      const y = document.querySelector('.ge-year:not(.ge-year-line)'), l = document.querySelector('.ge-year-line');
-      if (y && l) l.style.marginTop = y.offsetTop + 'px';
+      const fit = () => {
+        const y = document.querySelector('.ge-year:not(.ge-year-line)'), l = document.querySelector('.ge-year-line');
+        if (y && l) l.style.marginTop = y.offsetTop + 'px';
+      };
+      fit();
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
+      setTimeout(fit, 600); setTimeout(fit, 1800);
+      addEventListener('resize', fit);
     },
 
     // Portada: diploma enrollado con listón

@@ -26,7 +26,7 @@
   THEMES.graduacion = {
     fonts: 'https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,800;1,600&family=Lato:wght@400;700;900&display=swap',
     fullHero: true,
-    coverDelay: 1700,
+    coverDelay: 3900, // el diploma se queda abierto para leerlo
     labels: {
       countdown: 'Faltan', family: 'Gracias a', when: '¿Cuándo y dónde?', schedule: 'Programa', story: 'Desde pequeña lo sabía',
       gallery: 'Recuerdos', dress: 'Código de vestimenta', gifts: 'Regalos', faq: 'Preguntas', social: 'Comparte el momento',
@@ -95,6 +95,10 @@
 
     // Al abrir: birretes al aire
     onOpen() {
+      // Los birretes salen y la portada se anima justo cuando el diploma se desvanece
+      setTimeout(() => this.reveal(), 3000);
+    },
+    reveal() {
       document.body.classList.add('gr-open');
       const box = document.createElement('div'); box.className = 'gr-toss';
       for (let k = 0; k < 9; k++) {

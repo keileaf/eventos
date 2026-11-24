@@ -177,11 +177,11 @@
       },
       deleteGuest(req) {
         const ev = this.eventFor(this.auth(req), req.e);
-        this.db.guests[ev.id] = this.guests(ev.id).filter(g => g.token !== req.token); return true;
+        this.db.guests[ev.id] = this.guests(ev.id).filter(g => g.token !== req.invitadoToken); return true;
       },
       reissueGuest(req) {
         const ev = this.eventFor(this.auth(req), req.e);
-        const old = this.guests(ev.id).find(x => x.token === req.token); if (!old) throw new Error('Invitado no encontrado');
+        const old = this.guests(ev.id).find(x => x.token === req.invitadoToken); if (!old) throw new Error('Invitado no encontrado');
         const g = { token: rid(12), nombre: old.nombre, personas: old.personas, lugares: old.lugares, telefono: old.telefono, mesa: old.mesa || '', estado: 'pendiente', confirmados: 0, detalle: '', mensaje: '', respondido: '', enviado: '', creado: now() };
         this.db.guests[ev.id] = this.guests(ev.id).filter(x => x !== old); this.db.guests[ev.id].push(g);
         if (ev.mesas) ev.mesas = JSON.parse(JSON.stringify(ev.mesas).split('"' + old.token + '"').join('"' + g.token + '"'));
@@ -189,7 +189,7 @@
       },
       markSent(req) {
         const ev = this.eventFor(this.auth(req), req.e);
-        const g = this.guests(ev.id).find(x => x.token === req.token); if (!g) throw new Error('Invitado no encontrado');
+        const g = this.guests(ev.id).find(x => x.token === req.invitadoToken); if (!g) throw new Error('Invitado no encontrado');
         g.enviado = now(); return g;
       },
       createEvent(req) {

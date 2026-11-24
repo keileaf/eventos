@@ -647,15 +647,15 @@
       const msg = U.fillTemplate(c.whatsapp || '¡Hola {nombre}! Aquí está tu invitación: {enlace}', { nombre: g.nombre, festejado: c.festejado || '', edad: c.edad || '', enlace: link });
       if (g.telefono) window.open(U.waUrl(g.telefono, msg), '_blank', 'noopener');
       else (await U.copy(msg)) ? U.toast('Mensaje copiado. Pégalo en WhatsApp.', 'ok') : U.toast(msg);
-      try { Object.assign(g, await API.call('markSent', { e: S.ev.id, token: g.token })); renderStats(); renderGuests(); } catch (err) { handleErr(err); }
+      try { Object.assign(g, await API.call('markSent', { e: S.ev.id, invitadoToken: g.token })); renderStats(); renderGuests(); } catch (err) { handleErr(err); }
     };
     $('[data-a=del]', card).onclick = (e) => confirmBtn(e.currentTarget, async () => {
-      await API.call('deleteGuest', { e: S.ev.id, token: g.token });
+      await API.call('deleteGuest', { e: S.ev.id, invitadoToken: g.token });
       S.guests = S.guests.filter(x => x !== g); renderStats(); renderGuests(); U.toast('Invitación eliminada', 'ok');
     });
     const re = $('[data-a=reissue]', card);
     if (re) re.onclick = (e) => confirmBtn(e.currentTarget, async () => {
-      const ng = await API.call('reissueGuest', { e: S.ev.id, token: g.token });
+      const ng = await API.call('reissueGuest', { e: S.ev.id, invitadoToken: g.token });
       S.guests = S.guests.map(x => x === g ? ng : x); renderStats(); renderGuests();
       U.toast('Invitación nueva creada. Envíale el enlace nuevo.', 'ok');
     });

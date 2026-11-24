@@ -807,15 +807,28 @@
   }
 
   // Botón de confirmación en dos clics (sin diálogos del navegador)
+  // Confirmación con ventana: "¿Eliminar…?" → Cancelar / Sí, eliminar (con aviso mientras trabaja)
   function confirmBtn(btn, fn) {
-    if (btn.dataset.armed) {
-      btn.disabled = true;
-      Promise.resolve(fn()).catch(handleErr).finally(() => { btn.disabled = false; });
-      return;
-    }
-    const txt = btn.textContent; btn.dataset.armed = '1'; btn.textContent = '¿Seguro?'; btn.classList.add('armed');
-    setTimeout(() => { if (btn.isConnected) { delete btn.dataset.armed; btn.textContent = txt; btn.classList.remove('armed'); } }, 3000);
+    const card = btn.closest('.guest, .tbl, .ev, .urow, .ph-t, .modal-card');
+    const who = card ? ($('b, .tbl-name, h3', card) || {}).textContent || '' : '';
+    const label = (btn.dataset.label || btn.textContent || 'Continuar').replace('✕', 'Eliminar foto').trim();
+    const dlg = document.createElement('div'); dlg.className = 'modal';
+    dlg.innerHTML = `<div class="card modal-card">
+      <h3>${esc(label)}${who ? ': ' + esc(who.replace(' ✎', '')) : ''}</h3>
+      <p class="meta">¿Seguro? Esta acción no se puede deshacer.</p>
+      <div class="actions"><button class="btn" data-x="no">Cancelar</button><button class="btn danger armed" data-x="si">Sí, ${esc(label.toLowerCase())}</button></div>
+    </div>`;
+    document.body.appendChild(dlg);
+    const close = () => dlg.remove();
+    dlg.addEventListener('click', (e) => { if (e.target === dlg) close(); });
+    $('[data-x=no]', dlg).onclick = close;
+    const yes = $('[data-x=si]', dlg); yes.focus();
+    yes.onclick = async () => {
+      yes.disabled = true; $('[data-x=no]', dlg).disabled = true; yes.textContent = 'Un momento…';
+      try { await fn(); close(); } catch (err) { close(); handleErr(err); }
+    };
   }
+
 
   route();
 })();

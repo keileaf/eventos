@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 720" width="600" height="720">
+<rect width="600" height="720" fill="#f4efe4"/><rect x="24" y="24" width="552" height="672" rx="18" fill="none" stroke="#c9a54a" stroke-width="3" stroke-dasharray="14 10"/>
+<g transform="translate(0 30.0)"><g transform="translate(300 300)"><path d="M-120 -10 L0 -60 L120 -10 L0 40Z" fill="#1f2a4a"/><path d="M-70 10 V60 Q0 95 70 60 V10 L0 40Z" fill="#2c3a63"/><path d="M95 0 V70" stroke="#c9a54a" stroke-width="6"/><circle cx="95" cy="78" r="12" fill="#c9a54a"/></g></g>
+<text x="300" y="470.0" text-anchor="middle" font-family="Georgia,serif" font-size="34" fill="#1f2a4a">De bebé con birrete</text>
+<text x="300" y="520.0" text-anchor="middle" font-family="Arial,sans-serif" font-size="22" fill="#8a8170">Foto de muestra</text></svg>

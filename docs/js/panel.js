@@ -679,7 +679,7 @@
       <div class="row2"><label>Festejado(a)<input name="festejado" value="${esc(c.festejado)}"></label>
       <label>Edad<input name="edad" type="number" value="${esc(c.edad)}"></label></div>
       <div class="row2"><label>Tipo<select name="tipo">${Object.entries(CFG.TIPOS).map(([k, v]) => `<option value="${k}" ${c.tipo === k ? 'selected' : ''}>${v}</option>`).join('')}</select></label>
-      <label>Diseño<select name="tema">${Object.entries(CFG.TEMAS).map(([k, v]) => `<option value="${k}" ${ev.tema === k ? 'selected' : ''}>${esc(v.nombre)}</option>`).join('')}</select></label></div>
+      <label>Diseño<select name="tema">${Object.entries(CFG.TEMAS).filter(([k, v]) => !v.privado || S.me.rol === 'admin' || ev.tema === k).map(([k, v]) => `<option value="${k}" ${ev.tema === k ? 'selected' : ''}>${esc(v.nombre)}</option>`).join('')}</select></label></div>
       <label>Encabezado<input name="encabezado" value="${esc(c.encabezado)}"></label>
       <label>Frase principal<textarea name="frase" rows="2">${esc(c.frase)}</textarea></label>
       <div class="row2"><label>Fecha y hora<input name="fecha" type="datetime-local" value="${esc(c.fecha)}"></label>

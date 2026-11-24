@@ -12,6 +12,7 @@ window.APP_CONFIG = {
     xv: { nombre: 'XV años · Rosa y oro', para: 'Quince años' },
     'xv-azul': { nombre: 'XV años · Azul acuarela', para: 'Quince años' },
     boda: { nombre: 'Boda · Jardín al atardecer', para: 'Boda' },
+    graduacion: { nombre: 'Graduación · Mere (exclusivo)', para: 'Graduación', privado: true },
   },
   // Contacto y redes de la portada. Deja vacía una red para ocultar su botón.
   CONTACTO: {
@@ -30,5 +31,5 @@ window.APP_CONFIG = {
   ],
   // Precios de diseño (pago único, MXN)
   PRECIOS: { fiesta: 250, xv: 400, boda: 500 },
-  TIPOS: { cumpleanos: 'Cumpleaños', xv: 'XV años', boda: 'Boda', bautizo: 'Bautizo', otro: 'Otro' },
+  TIPOS: { cumpleanos: 'Cumpleaños', xv: 'XV años', boda: 'Boda', bautizo: 'Bautizo', graduacion: 'Graduación', otro: 'Otro' },
 };

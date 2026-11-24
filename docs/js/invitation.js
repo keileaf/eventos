@@ -213,6 +213,7 @@
       </div>`;
 
     if (th.ambient) th.ambient($('#ambient'), cfg);
+    if (th.afterRender) th.afterRender(cfg);
     if (cfg.musica) Music.init(cfg.musica);
     bindCover();
     bindRsvp();
@@ -649,7 +650,7 @@
   function gcal(cfg, start, lugar) {
     const end = new Date(start.getTime() + (Number(cfg.duracionHoras) || 4) * 36e5);
     const f = d => d.getFullYear() + String(d.getMonth() + 1).padStart(2, '0') + String(d.getDate()).padStart(2, '0') + 'T' + String(d.getHours()).padStart(2, '0') + String(d.getMinutes()).padStart(2, '0') + '00';
-    const titulo = cfg.titulo || (cfg.tipo === 'xv' ? 'XV años de ' : cfg.tipo === 'boda' ? 'Boda de ' : 'Fiesta de ') + (cfg.festejado || '');
+    const titulo = (cfg.tipo === 'xv' ? 'XV años de ' : cfg.tipo === 'boda' ? 'Boda de ' : cfg.tipo === 'graduacion' ? 'Graduación de ' : 'Fiesta de ') + (cfg.festejado || '');
     const q = new URLSearchParams({ action: 'TEMPLATE', text: titulo, dates: f(start) + '/' + f(end), location: lugar ? [lugar.nombre, lugar.direccion].filter(Boolean).join(', ') : '', details: cfg.frase || '' });
     return 'https://calendar.google.com/calendar/render?' + q.toString();
   }

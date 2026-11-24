@@ -9,3 +9,6 @@ Si el archivo no existe, el botón de música simplemente no aparece.
 Demo de Valentina: guarda aquí un archivo llamado  cuento.mp3
 Sugerencia libre de derechos (solo pide crédito, ya incluido al pie):
   "Frost Waltz" de Kevin MacLeod  ->  https://incompetech.com
+
+Graduación de Mere: guarda aquí un archivo llamado  graduacion.mp3
+  Sugerencia: "Pomp and Circumstance" (Elgar) en una grabación de dominio público, p. ej. de musopen.org

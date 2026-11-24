@@ -43,7 +43,7 @@
   };
 
   /* ================= BACKEND DEMO (imita a Code.gs) ================= */
-  const DEMO_KEY = 'inv_demo_v14';
+  const DEMO_KEY = 'inv_demo_v17';
   const Demo = {
     db: null,
     load() {
